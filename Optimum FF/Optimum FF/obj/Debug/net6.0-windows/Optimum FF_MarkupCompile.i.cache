@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET6_0;NETCOREAPP
 C:\Users\mw3lo\source\repos\Optimum-FF\Optimum FF\Optimum FF\App.xaml
-2-226953183
+3-1208793738
 
-6720656234
+7-1426441659
 195-1830010649
-MainWindow.xaml;OptimizePage.xaml;
+MainMenu.xaml;MainWindow.xaml;OptimizePage.xaml;
 
-False
+True
 

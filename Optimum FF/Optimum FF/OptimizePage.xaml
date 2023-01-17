@@ -10,7 +10,8 @@
     
     <ScrollViewer>
         <StackPanel>
-            <Label HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" FontSize="24" >Optimize</Label>
+            <Button HorizontalAlignment="Left" VerticalAlignment="Top" Height="45" Width="100" Click="Back">Back</Button>
+            <Label HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 -45 0 0" FontWeight="Bold" FontSize="24" >Optimize</Label>
             <ListBox Name="playerList">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">

@@ -28,3 +28,5 @@ C:\Users\mw3lo\source\repos\Optimum-FF\Optimum FF\Optimum FF\bin\Debug\net6.0-wi
 C:\Users\mw3lo\source\repos\Optimum-FF\Optimum FF\Optimum FF\bin\Debug\net6.0-windows\runtimes\win-x86\native\sni.dll
 C:\Users\mw3lo\source\repos\Optimum-FF\Optimum FF\Optimum FF\bin\Debug\net6.0-windows\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
 C:\Users\mw3lo\source\repos\Optimum-FF\Optimum FF\Optimum FF\bin\Debug\net6.0-windows\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\Users\mw3lo\source\repos\Optimum-FF\Optimum FF\Optimum FF\obj\Debug\net6.0-windows\MainMenu.g.cs
+C:\Users\mw3lo\source\repos\Optimum-FF\Optimum FF\Optimum FF\obj\Debug\net6.0-windows\MainMenu.baml

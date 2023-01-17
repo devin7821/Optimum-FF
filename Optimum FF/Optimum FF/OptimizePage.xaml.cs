@@ -24,35 +24,47 @@ namespace Optimum_FF
         public OptimizePage()
         {
             InitializeComponent();
-            //playerList = new ListBox();
+
+            //Create SQL connection
             string connectionString = @"SERVER=.\SQLEXPRESS;DATABASE=tempdb;User ID=mainuser;Password=123";
             using (var conn = new SqlConnection(connectionString))
             {
                 conn.Open();
-                SqlCommand cmd;
                 var sql = "SELECT * FROM QBs";
-                cmd = new SqlCommand(sql, conn);
-
-                SqlDataReader dr = cmd.ExecuteReader();
-                
-                while (dr.Read())
+                using (var cmd = new SqlCommand(sql, conn))
                 {
-                    string player = dr["Player"].ToString();
-                    string tds = dr["TDs"].ToString();
-                    string interceptions = dr["Int"].ToString();
-                    if (player != null)
+                    SqlDataReader dr = cmd.ExecuteReader();
+
+                    //Read QB Data
+                    while (dr.Read())
                     {
-                        ListBoxItem item = new ListBoxItem();
-                        TextBlock playerBlock = new TextBlock();
-                        //Players.Text = string.Join(Environment.NewLine, player);
-                        playerBlock.Text = player;
-                        playerBlock.Text += (" TDs: " + tds);
-                        playerBlock.Text += (" Int: " + interceptions);
-                        item.Content = playerBlock;
-                        playerList.Items.Add(item);
+                        //Get Player info
+                        string player = dr["Player"].ToString();
+                        string tds = dr["TDs"].ToString();
+                        string interceptions = dr["Int"].ToString();
+                        //Check if player is null
+                        if (player != null)
+                        {
+                            //Create and fill data of a new ListBoxItem
+                            ListBoxItem item = new ListBoxItem();
+                            TextBlock playerBlock = new TextBlock();
+                            playerBlock.Text = player;
+                            playerBlock.Text += (" TDs: " + tds);
+                            playerBlock.Text += (" Int: " + interceptions);
+                            item.Content = playerBlock;
+                            //Add to list
+                            playerList.Items.Add(item);
+                        }
                     }
+                    dr.Close();
                 }
             }
+        }
+
+        private void Back(object sender, RoutedEventArgs e)
+        {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow?.ChangeView(new MainMenu());
         }
     }
 }

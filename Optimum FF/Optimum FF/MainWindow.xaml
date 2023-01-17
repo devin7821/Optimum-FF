@@ -6,7 +6,10 @@
         xmlns:local="clr-namespace:Optimum_FF"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <Button x:Name="OptimizeButton" Click="OptimizeButton_Click" HorizontalAlignment="Center" VerticalAlignment="center" Content="Optimize"/>
+    <Grid Loaded="OnMainMenuLoaded">
+        <Frame
+            Name="mainFrame"
+            Background="White"
+            NavigationUIVisibility="Visible"/>
     </Grid>
 </Window>

@@ -25,12 +25,18 @@ namespace Optimum_FF
         public MainWindow()
         {
             InitializeComponent();
+            Application.Current.MainWindow = this;
+            Loaded += OnMainMenuLoaded;
         }
 
-        private void OptimizeButton_Click(object sender, RoutedEventArgs e)
+        private void OnMainMenuLoaded(object sender, RoutedEventArgs e)
         {
-            OptimizePage pg = new OptimizePage();
-            this.Content = pg;
+            ChangeView(new MainMenu());
+        }
+
+        public void ChangeView(Page view)
+        {
+            mainFrame.NavigationService.Navigate(view);
         }
     }
 }
