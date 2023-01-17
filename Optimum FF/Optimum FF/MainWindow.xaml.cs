@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +25,12 @@ namespace Optimum_FF
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void OptimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            OptimizePage pg = new OptimizePage();
+            this.Content = pg;
         }
     }
 }
