@@ -9,6 +9,7 @@
       Title="MainMenu">
 
     <StackPanel>
+        <Image Source="/img/OFF.png" Height="263" Width="552"></Image>
         <Button x:Name="OptimizeButton" Click="OptimizeButton_Click" HorizontalAlignment="Center" VerticalAlignment="center" Content="Optimize"/>
     </StackPanel>
 </Page>
