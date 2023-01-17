@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Configuration;
 
 namespace Optimum_FF
 {
@@ -26,7 +27,7 @@ namespace Optimum_FF
             InitializeComponent();
 
             //Create SQL connection
-            string connectionString = @"SERVER=.\SQLEXPRESS;DATABASE=tempdb;User ID=mainuser;Password=123";
+            string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
             using (var conn = new SqlConnection(connectionString))
             {
                 conn.Open();
