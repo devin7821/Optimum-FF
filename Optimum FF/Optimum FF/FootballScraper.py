@@ -18,6 +18,29 @@ month = datetime.now().month
 year = datetime.now().year
 if (month < 8):
     year = year - 1
+    
+def create_game_table(curr):
+    create_table_command = ("""IF OBJECT_ID(N'dbo.Games', N'U') IS NULL
+                                        CREATE TABLE [dbo].[Games] (
+                                            [Week] [int] NOT NULL,
+                                            [Home] [varchar](50) NOT NULL,
+                                            [Away] [varchar](50) NOT NULL)""")
+    curr.execute(create_table_command)
+
+def create_team_table(curr):
+    create_table_command = ("""IF OBJECT_ID(N'dbo.Teams', N'U') IS NULL
+                                        CREATE TABLE [dbo].[Teams] (
+                                            [Team] [varchar](50) NOT NULL,
+                                            [Opponent] [varchar](50) NOT NULL,
+                                            [Week] [int] NOT NULL,
+                                            [Games] [int] NULL,
+                                            [PA] [int] NULL,
+                                            [PTD] [int] NULL,
+                                            [RTD] [int] NULL,
+                                            [TO] [int] NULL,
+                                            [Int] [int] NULL,
+                                            [RETYPG] [INT] NULL)""")
+    curr.execute(create_table_command)
 
 def create_qb_table(curr):
         create_table_command = ("""IF OBJECT_ID(N'dbo.QBs', N'U') IS NULL
@@ -85,6 +108,62 @@ def check_if_exists(curr, player, table):
     curr.execute(query, vars)
     
     return curr.fetchone() is not None
+
+def AddGames(cursor, cnxn):      
+    def check_if_game_exists(curr, home, away):
+        query = ("""SELECT Home, Away FROM Games WHERE Home = ? AND Away = ?""")
+        vars = ([home, away])
+        curr.execute(query, vars)
+        
+        return curr.fetchone() is not None
+
+    #QB Scrape Info    
+    url = "https://www.pro-football-reference.com/years/{}/games.htm#games".format(year)
+    html = urlopen(url)
+    soup = BeautifulSoup(html, features="lxml")
+
+    #Get Headers
+    headers = [th.getText() for th in soup.findAll('tr')[0].findAll('th')]
+    headers = headers[0:]
+
+    #Get Rows
+    rows = soup.findAll('tr', class_ = lambda table_rows: table_rows != "thead")
+    player_stats = []
+    j = 0
+    for row in rows:
+        player_stats.append([th.getText() for th in rows[j].findAll('th', {'data-stat': 'week_num'})])
+        player_stats[j].extend([td.getText() for td in rows[j].findAll('td')])
+        j += 1
+    #player_stats = [[td.getText() for td in rows[i].findAll('td', 'th')] for i in range(len(rows))]
+    player_stats = player_stats[1:]
+
+    #Create DataFrame
+    stats = pd.DataFrame(player_stats, columns = headers)
+    stats.head()
+
+    stats = stats.replace(r'', None, regex=True)
+    stats.columns.values[5] = 'Location'
+    stats.columns = stats.columns.str.replace(r"[/]", "b", regex=True)
+    stats.columns = stats.columns.str.replace(r"[%]", "p", regex=True)
+    
+    create_qb_table(cursor)
+    cnxn.commit()
+    
+    print(stats.head())
+
+    for index, row in stats.iterrows():
+        if str(row.Week).isnumeric():
+            insert_into_games = ("""INSERT INTO Games (Week, Home, Away) values(?,?,?);""")
+            if row.Location is None:
+                if not check_if_game_exists(cursor, str(row.Winnerbtie), str(row.Loserbtie)):
+                    game_to_insert = ([int(row.Week), str(row.Winnerbtie), str(row.Loserbtie)])
+                    cursor.execute(insert_into_games, game_to_insert)
+            else:
+                if not check_if_game_exists(cursor, str(row.Loserbtie), str(row.Winnerbtie)):
+                    game_to_insert = ([int(row.Week), str(row.Loserbtie), str(row.Winnerbtie)])
+                    cursor.execute(insert_into_games, game_to_insert)
+
+    cnxn.commit()
 
 def AddQBs(cursor, cnxn):      
     def update_qb_row(curr, row):
@@ -235,12 +314,14 @@ def main():
     cursor = cnxn.cursor()
     
     #Add Tables
+    create_game_table(cursor)
     create_qb_table(cursor)
     create_wr_table(cursor)
     create_rb_table(cursor)
     create_te_table(cursor)
     
     #Add Players to DB
+    AddGames(cursor, cnxn)
     AddQBs(cursor, cnxn)
     AddReceiving(cursor, cnxn)
     

@@ -26,6 +26,9 @@ namespace Optimum_FF
         {
             InitializeComponent();
 
+            Lineup lineup = new Lineup();
+            lineup.Players = new List<Player>();
+
             //Create SQL connection
             string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
             using (var conn = new SqlConnection(connectionString))
@@ -40,26 +43,33 @@ namespace Optimum_FF
                     while (dr.Read())
                     {
                         //Get Player info
-                        string player = dr["Player"].ToString();
-                        string tds = dr["TDs"].ToString();
-                        string interceptions = dr["Int"].ToString();
+                        string name = dr["Player"].ToString();
+                        
                         //Check if player is null
-                        if (player != null)
+                        if (name != null)
                         {
-                            //Create and fill data of a new ListBoxItem
-                            ListBoxItem item = new ListBoxItem();
-                            TextBlock playerBlock = new TextBlock();
-                            playerBlock.Text = player;
-                            playerBlock.Text += (" TDs: " + tds);
-                            playerBlock.Text += (" Int: " + interceptions);
-                            item.Content = playerBlock;
-                            //Add to list
-                            playerList.Items.Add(item);
+                            Player player = new Player();
+                            player.Name = name;
+                            lineup.Players.Add(player);
+                            
                         }
                     }
                     dr.Close();
                 }
             }
+
+            foreach (var player in lineup.Players)
+            {
+                ListBoxItem item = new ListBoxItem();
+                TextBlock playerBlock = new TextBlock();
+                playerBlock.Text = player.Name;
+                //playerBlock.Text += (" TDs: " + tds);
+                //playerBlock.Text += (" Int: " + interceptions);
+                item.Content = playerBlock;
+                //Add to list
+                playerList.Items.Add(item);
+            }
+            //lineup.Display();
         }
 
         private void Back(object sender, RoutedEventArgs e)
