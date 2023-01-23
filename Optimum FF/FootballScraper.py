@@ -13,6 +13,13 @@ database = 'OFF'
 username = 'mainuser'
 password = 'optimumfootball3!'
 
+#Team Dictionary
+teams = {
+    "Arizona Cardinals": "ARI",
+    "Atlanta Falcons": "ATL",
+    "Baltimore Ravens": "BAL",
+}
+
 #Get Current Season
 month = datetime.now().month
 year = datetime.now().year
@@ -31,15 +38,13 @@ def create_team_table(curr):
     create_table_command = ("""IF OBJECT_ID(N'dbo.Teams', N'U') IS NULL
                                         CREATE TABLE [dbo].[Teams] (
                                             [Team] [varchar](50) NOT NULL,
-                                            [Opponent] [varchar](50) NOT NULL,
-                                            [Week] [int] NOT NULL,
                                             [Games] [int] NULL,
-                                            [PA] [int] NULL,
                                             [PTD] [int] NULL,
                                             [RTD] [int] NULL,
                                             [TO] [int] NULL,
                                             [Int] [int] NULL,
-                                            [RETYPG] [INT] NULL)""")
+                                            [RETYPG] [int] NULL,
+                                            [DTD] [int] NULL)""")
     curr.execute(create_table_command)
 
 def create_qb_table(curr):
@@ -145,8 +150,7 @@ def AddGames(cursor, cnxn):
     stats.columns.values[5] = 'Location'
     stats.columns = stats.columns.str.replace(r"[/]", "b", regex=True)
     stats.columns = stats.columns.str.replace(r"[%]", "p", regex=True)
-    
-    create_qb_table(cursor)
+
     cnxn.commit()
 
     for index, row in stats.iterrows():
@@ -160,6 +164,52 @@ def AddGames(cursor, cnxn):
                 if not check_if_game_exists(cursor, str(row.Loserbtie), str(row.Winnerbtie)):
                     game_to_insert = ([int(row.Week), str(row.Loserbtie), str(row.Winnerbtie)])
                     cursor.execute(insert_into_games, game_to_insert)
+
+    cnxn.commit()
+
+def AddTeamsPassing(cursor, cnxn):      
+    def update_team_row(curr, row):
+        query = ("""UPDATE Teams 
+                    SET Games = ?,
+                        PTD = ?,
+                        Int = ?,
+                        Sk = ?,
+                    WHERE Team = ?;""")
+        vars = ([int(row.G), int(row.TD), int(row.Int), int(row.Sk), str(row.Tm)])
+        curr.execute(query, vars)
+
+    #QB Scrape Info    
+    url = "https://www.pro-football-reference.com/years/{}/opp.htm#passing".format(year)
+    html = urlopen(url)
+    soup = BeautifulSoup(html, features="lxml")
+
+    #Get Headers
+    headers = [th.getText() for th in soup.findAll('tr')[0].findAll('th')]
+    headers = headers[1:]
+
+    #Get Rows
+    rows = soup.findAll('tr', class_ = lambda table_rows: table_rows != "thead")
+    player_stats = [[td.getText() for td in rows[i].findAll('td')]
+                    for i in range(len(rows))]
+    player_stats = player_stats[1:]
+
+    #Create DataFrame
+    stats = pd.DataFrame(player_stats, columns = headers)
+    stats.head()
+
+    stats = stats.replace(r'', 0, regex=True)
+    stats.columns = stats.columns.str.replace(r"[/]", "b", regex=True)
+    stats.columns = stats.columns.str.replace(r"[%]", "p", regex=True)
+
+    for index, row in stats.iterrows():
+        if row.Pos == "Team":
+            row.Player = re.sub('[^a-zA-Z. \d\s]', '', row.Player)
+            if check_if_exists(cursor, row.Tm, "Teams"):
+                update_team_row(cursor, row)
+            else:
+                insert_into_teams = ("""INSERT INTO Teams (Team, Games, PTD, Int, Sk) values(?,?,?,?,?);""")
+                team_to_insert = ([str(row.Tm), int(row.G), int(row.TD), int(row.Int), int(row.Sk)])
+                cursor.execute(insert_into_teams, team_to_insert)
 
     cnxn.commit()
 
@@ -315,6 +365,7 @@ def main():
     
     #Add Tables
     create_game_table(cursor)
+    create_team_table(cursor)
     create_qb_table(cursor)
     create_wr_table(cursor)
     create_rb_table(cursor)
@@ -322,11 +373,13 @@ def main():
     
     #Add Players to DB
     AddGames(cursor, cnxn)
+
     AddQBs(cursor, cnxn)
     AddReceiving(cursor, cnxn)
     
     #Close cursor
     cursor.close()
+    cnxn.close()
     
 if __name__ == "__main__":
     main()
