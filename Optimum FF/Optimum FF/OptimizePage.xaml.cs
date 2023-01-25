@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Configuration;
+using System.Diagnostics;
 
 namespace Optimum_FF
 {
@@ -22,53 +23,40 @@ namespace Optimum_FF
     /// </summary>
     public partial class OptimizePage : Page
     {
+        PlayerMasterList masterList = new PlayerMasterList();
+        Lineup lineup = new Lineup();
         public OptimizePage()
-        {
+        {            
             InitializeComponent();
 
-            Lineup lineup = new Lineup();
-            lineup.Players = new List<Player>();
+            //Lineup lineup = new Lineup();
+            //lineup.Players = new List<Player>();
 
-            //Create SQL connection
-            string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
-            using (var conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
-                var sql = "SELECT * FROM QBs";
-                using (var cmd = new SqlCommand(sql, conn))
-                {
-                    SqlDataReader dr = cmd.ExecuteReader();
 
-                    //Read QB Data
-                    while (dr.Read())
-                    {
-                        //Get Player info
-                        string name = dr["Player"].ToString();
-                        
-                        //Check if player is null
-                        if (name != null)
-                        {
-                            Player player = new Player();
-                            player.Name = name;
-                            lineup.Players.Add(player);
-                            
-                        }
-                    }
-                    dr.Close();
-                }
-            }
 
-            foreach (var player in lineup.Players)
+            //lineup.Players.Add(masterList.Players[0]);
+            //lineup.Players.Add(masterList.Players[40]);
+            //lineup.Players.Add(masterList.Players[80]);
+            //lineup.Players.Add(masterList.Players[120]);
+            //lineup.Players.Add(masterList.Players[121]);
+            //lineup.Players.Add(masterList.Players[200]);
+
+            for (int i = 0; i < lineup.Settings.TotalCount; i++)
             {
                 ListBoxItem item = new ListBoxItem();
                 TextBlock playerBlock = new TextBlock();
-                playerBlock.Text = player.Name;
-                //playerBlock.Text += (" TDs: " + tds);
-                //playerBlock.Text += (" Int: " + interceptions);
-                item.Content = playerBlock;
+                //playerBlock.Text = player.Name;
+                //playerBlock.Text += player?.Team?.Name;
+                //item.Content = playerBlock;
                 //Add to list
                 playerList.Items.Add(item);
             }
+            var players = new string[masterList.Players.Count()];
+            for (int i = 0; i < players.Count(); i++)
+            {
+                players[i] = masterList.Players[i].Name;
+            }
+            search.ItemsSource = players;
             //lineup.Display();
         }
 
@@ -76,6 +64,50 @@ namespace Optimum_FF
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             mainWindow?.ChangeView(new MainMenu());
+        }
+
+        private void AddPlayer_Click(object sender, RoutedEventArgs e)
+        {
+            bool found = false;
+            foreach(var player in masterList.Players)
+            {
+                if (found == false && player.Name == search.Text)
+                {
+                    TextBlock playerBlock = new TextBlock();
+                    playerBlock.Text = player.Name;
+                    playerBlock.Text += " ";
+                    playerBlock.Text += player.Team.Name;
+                    string addString = player.Name + " " + player.Team.Name;
+                    for (int i = 0; i < playerList.Items.Count; i++)
+                    {
+                        //var content = ((ListBoxItem)playerList.Items[i]).Content;
+                        //var name = content.ToString();
+                        if (((ListBoxItem)playerList.Items[i]).Content != null)
+                        {
+                            if (((ListBoxItem)playerList.Items[i]).Content.ToString() == addString)
+                            {
+                                return;
+                            }
+                        }
+                        if (found == false)
+                        {
+                            ListBoxItem newItem = new ListBoxItem();
+                            newItem.Content = playerBlock;
+                            playerList.Items.Insert(i, newItem);
+                            found = true;
+                        }
+                    }
+                    lineup.Players.Add(player);
+                    //Remove Offensive players from the DP list in python
+                    //ListBoxItem item = new ListBoxItem();
+                    //TextBlock playerBlock = new TextBlock();
+                    //playerBlock.Text = player.Name;
+                    //playerBlock.Text += " ";
+                    //playerBlock.Text += player.Team.Name;
+                    //item.Content = playerBlock;
+                    //playerList.Items.Add(item);
+                }
+            }
         }
     }
 }
