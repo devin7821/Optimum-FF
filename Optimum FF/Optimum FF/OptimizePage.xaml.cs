@@ -25,39 +25,82 @@ namespace Optimum_FF
     {
         PlayerMasterList masterList = new PlayerMasterList();
         Lineup lineup = new Lineup();
+        //Add kickers to scrape
         public OptimizePage()
-        {            
+        {
             InitializeComponent();
 
-            //Lineup lineup = new Lineup();
-            //lineup.Players = new List<Player>();
+            this.playerList.ItemsSource = lineup.Players;
 
 
-
-            //lineup.Players.Add(masterList.Players[0]);
-            //lineup.Players.Add(masterList.Players[40]);
-            //lineup.Players.Add(masterList.Players[80]);
-            //lineup.Players.Add(masterList.Players[120]);
-            //lineup.Players.Add(masterList.Players[121]);
-            //lineup.Players.Add(masterList.Players[200]);
-
-            for (int i = 0; i < lineup.Settings.TotalCount; i++)
+            int i = 0;
+            while (i < lineup.Settings.TotalCount)
             {
-                ListBoxItem item = new ListBoxItem();
-                TextBlock playerBlock = new TextBlock();
-                //playerBlock.Text = player.Name;
-                //playerBlock.Text += player?.Team?.Name;
-                //item.Content = playerBlock;
-                //Add to list
-                playerList.Items.Add(item);
+                int j = 0;
+                while (j < lineup.Settings.QBCount)
+                { 
+                    lineup.Players[i + j].Position = "QB";
+                    j++;
+                }
+                i += j;
+                j = 0;
+                while (j < lineup.Settings.WRCount)
+                {
+                    lineup.Players[i + j].Position = "WR";
+                    j++;
+                }
+                i += j;
+                j = 0;
+                while (j < lineup.Settings.RBCount)
+                {
+                    lineup.Players[i + j].Position = "RB";
+                    j++;
+                }
+                i += j;
+                j = 0;
+                while (j < lineup.Settings.TECount)
+                {
+                    lineup.Players[i + j].Position = "TE";
+                    j++;
+                }
+                i += j;
+                j = 0;
+                while (j < lineup.Settings.KCount)
+                {
+                    lineup.Players[i + j].Position = "K";
+                    j++;
+                }
+                i += j;
+                j = 0;
+                while (j < lineup.Settings.DEFCount)
+                {
+                    lineup.Players[i + j].Position = "DEF";
+                    j++;
+                }
+                i += j;
+                j = 0;
+                while (j < lineup.Settings.DPCount)
+                {
+                    lineup.Players[i + j].Position = "DP";
+                    j++;
+                }
+                i += j;
+                j = 0;
+                while (j < lineup.Settings.BenchCount)
+                {
+                    lineup.Players[i + j].Position = "Bench";
+                    j++;
+                }
+                i += j;
             }
+            playerList.Items.Refresh();
+
             var players = new string[masterList.Players.Count()];
-            for (int i = 0; i < players.Count(); i++)
+            for (int j = 0; j < players.Count(); j++)
             {
-                players[i] = masterList.Players[i].Name;
+                players[j] = masterList.Players[j].Name;
             }
             search.ItemsSource = players;
-            //lineup.Display();
         }
 
         private void Back(object sender, RoutedEventArgs e)
@@ -69,43 +112,45 @@ namespace Optimum_FF
         private void AddPlayer_Click(object sender, RoutedEventArgs e)
         {
             bool found = false;
-            foreach(var player in masterList.Players)
+            foreach (var player in lineup.Players)
             {
-                if (found == false && player.Name == search.Text)
+                if (player == null)
                 {
-                    TextBlock playerBlock = new TextBlock();
-                    playerBlock.Text = player.Name;
-                    playerBlock.Text += " ";
-                    playerBlock.Text += player.Team.Name;
-                    string addString = player.Name + " " + player.Team.Name;
-                    for (int i = 0; i < playerList.Items.Count; i++)
+                    break;
+                }    
+                if (player.Name == search.Text)
+                {
+                    found = true;
+                }
+            }
+            if (!found)
+            {
+                foreach (var player in masterList.Players)
+                {
+                    if (player.Name == search.Text && player.Team != null)
                     {
-                        //var content = ((ListBoxItem)playerList.Items[i]).Content;
-                        //var name = content.ToString();
-                        if (((ListBoxItem)playerList.Items[i]).Content != null)
+                        for (int i = 0; i < lineup.Players.Count; i++)
                         {
-                            if (((ListBoxItem)playerList.Items[i]).Content.ToString() == addString)
+                            if (lineup.Players[i].Name == "" && (lineup.Players[i].Position == player.Position || lineup.Players[i].Position == "Bench"))
                             {
-                                return;
+                                lineup.Players[i].Name = player.Name;
+                                lineup.Players[i].Team = player.Team;
+                                if (lineup.Players[i].Position == "Bench")
+                                {
+                                    lineup.Players[i].Position = "Bench: " + player.Position;
+                                }
+                                else
+                                {
+                                    lineup.Players[i].Position = player.Position;
+                                }
+                                lineup.Players[i].Value = player.Value;
+                                lineup.Players[i].Rank = player.Rank;
+                                break;
                             }
                         }
-                        if (found == false)
-                        {
-                            ListBoxItem newItem = new ListBoxItem();
-                            newItem.Content = playerBlock;
-                            playerList.Items.Insert(i, newItem);
-                            found = true;
-                        }
+                        this.playerList.Items.Refresh();
+                        break;
                     }
-                    lineup.Players.Add(player);
-                    //Remove Offensive players from the DP list in python
-                    //ListBoxItem item = new ListBoxItem();
-                    //TextBlock playerBlock = new TextBlock();
-                    //playerBlock.Text = player.Name;
-                    //playerBlock.Text += " ";
-                    //playerBlock.Text += player.Team.Name;
-                    //item.Content = playerBlock;
-                    //playerList.Items.Add(item);
                 }
             }
         }

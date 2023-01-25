@@ -17,27 +17,29 @@ namespace Optimum_FF
         public float? Value { get; set; }
         public int? Rank { get; set; }
 
-       /* public Player(string name, string position, Team team, float value)
+        public Player()
         {
-            Name = name;
-            Position = position;
-            Team = team;
-            Value = value;
-        }*/
+            Name = "";
+            Position = "";
+            Team = new Team();
+            Value = 0;
+        }
 
-        //public ListBoxItem Display()
-        //{
-        //    ListBoxItem item = new ListBoxItem();
-        //    TextBlock playerBlock = new TextBlock();
-        //    playerBlock.Text = Name;
-        //    //playerBlock.Text += (" TDs: " + tds);
-        //    //playerBlock.Text += (" Int: " + interceptions);
-        //    item.Content = playerBlock;
-        //    //Add to list
-        //    //playerList.Items.Add(item);
-        //    Debug.WriteLine(Name);
+        public override string ToString()
+        {
+            return this.Position + " " + this.Name + " " + this.Team.Name + "\nValue: " + this.Value + " Rank: " + this.Rank;
+        }
 
-        //    return (item);
-        //}
+        public ListBoxItem Display()
+        {
+            ListBoxItem item = new ListBoxItem();
+            TextBlock playerBlock = new TextBlock();
+            playerBlock.Text = Name;
+            playerBlock.Text += " ";
+            playerBlock.Text += Team;
+            item.Content = playerBlock;
+
+            return (item);
+        }
     }
 }

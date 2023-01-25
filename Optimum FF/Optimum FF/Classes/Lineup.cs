@@ -27,16 +27,21 @@ namespace Optimum_FF
             Settings.BenchCount = 6;
             Settings.TotalCount = 15;
             Players = new List<Player>();
+            for (int i = 0; i <= Settings.TotalCount; i++)
+            {
+                Player player = new Player();
+                Players.Add(player);
+            }
         }
 
-        //public void Display(ListBox playerListBox)
-        //{
-        //    //ListBox playerListBox = new ListBox();
-        //    foreach (var player in Players)
-        //    {              
-        //        playerListBox
-
-        //    }
-        //}
+        public List<ListBoxItem> Display()
+        {
+            List<ListBoxItem> playerListBox = new List<ListBoxItem>();
+            foreach (var player in Players)
+            {
+                playerListBox.Add(player.Display());
+            } 
+            return playerListBox;
+        }
     }
 }

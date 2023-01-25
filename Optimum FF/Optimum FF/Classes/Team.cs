@@ -10,5 +10,11 @@ namespace Optimum_FF
     {
         public string? Name { get; set; }
         public string? Opponent { get; set; }
+
+        public Team()
+        {
+            Name = "";
+            Opponent = "";
+        }
     }
 }

@@ -15,6 +15,11 @@
             <Button x:Name="AddPlayer" HorizontalAlignment="Right" Width="100" Height="40" Margin="0 -40 0 0" Click="AddPlayer_Click">Add</Button>
             <Label HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" FontSize="24" >Optimize</Label>
             <ListBox Name="playerList">
+                <ListBox.Resources>
+                    <DataTemplate x:Key="PlayerTemplate">
+                        <TextBlock Text="{Binding Name}"></TextBlock>
+                    </DataTemplate>
+                </ListBox.Resources>
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="IsEnabled" Value="False"/>
