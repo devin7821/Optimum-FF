@@ -34,6 +34,13 @@ namespace Optimum_FF
             }
         }
 
+        public void Swap(Player player1, Player player2)
+        {
+            var index = Players.IndexOf(player2);
+            Players[Players.IndexOf(player1)] = player2;
+            Players[index] = player1;
+        }
+
         public List<ListBoxItem> Display()
         {
             List<ListBoxItem> playerListBox = new List<ListBoxItem>();

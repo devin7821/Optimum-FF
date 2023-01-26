@@ -38,7 +38,7 @@ namespace Optimum_FF
             {
                 int j = 0;
                 while (j < lineup.Settings.QBCount)
-                { 
+                {
                     lineup.Players[i + j].Position = "QB";
                     j++;
                 }
@@ -117,7 +117,7 @@ namespace Optimum_FF
                 if (player == null)
                 {
                     break;
-                }    
+                }
                 if (player.Name == search.Text)
                 {
                     found = true;
@@ -153,6 +153,87 @@ namespace Optimum_FF
                     }
                 }
             }
+        }
+
+        private void OptimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            RankQBs();
+        }
+
+        private void RankQBs()
+        {
+            List<Player> qbs;
+            qbs = masterList.Players.FindAll(x => x.Position == "QB");
+
+            foreach (var player in qbs)
+            {
+                //Create SQL connection
+                string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
+                using (var conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    var sql = "SELECT * FROM QBs WHERE Player=@Player";
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Player", player.Name);
+                        SqlDataReader dr = cmd.ExecuteReader();
+
+                        //Read QB Data
+                        while (dr.Read())
+                        {
+                            //Get Player info
+                            string name = dr["Player"].ToString();
+
+                            //Check if player is null
+                            if (name == player.Name)
+                            {
+                                double value = 0;
+
+                                int games = (int)dr["Games"];
+                                int att = (int)dr["Att"];
+                                int tds = (int)dr["TDs"];
+                                int interceptions = (int)dr["Int"];
+                                double ypg = (double)dr["YPG"];
+
+                                value = (att / games);
+                                value += ((tds / games) * 6);
+                                value -= ((interceptions / games) * 2);
+                                value += (ypg / 10);
+
+                                player.Value = value;
+                            }
+                        }
+                        dr.Close();
+                    }
+                }
+            }
+            qbs = qbs.OrderBy(x => x.Value).ToList();
+            for (int i = qbs.Count() - 1; i >= 0; i--)
+            {
+                qbs[i].Rank = qbs.Count() - i;
+            }
+            foreach (var player in lineup.Players) if (player.Position.EndsWith("QB"))
+                {
+                    player.Value = qbs.Find(x => x.Name.Contains(player.Name)).Value;
+                    player.Rank = qbs.Find(x => x.Name.Contains(player.Name)).Rank;
+                }
+            for (int i = 0; i < lineup.Settings.QBCount; i++)
+            {
+                restart:
+                foreach (var player in lineup.Players) if (player.Position.Contains("Bench: QB"))
+                    {
+                        if (player.Rank < lineup.Players[i].Rank)
+                        {
+                            player.Position = "QB";
+                            lineup.Players[i].Position = "Bench: QB";
+                            lineup.Swap(player, lineup.Players[i]);
+                            goto restart;
+                        }
+                    }
+            }
+            playerList.ItemsSource = lineup.Players;
+            playerList.Items.Refresh();
         }
     }
 }

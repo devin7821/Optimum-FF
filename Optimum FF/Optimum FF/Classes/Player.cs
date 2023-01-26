@@ -14,7 +14,7 @@ namespace Optimum_FF
         public string? Name { get; set; }
         public string? Position { get; set; }
         public Team? Team { get; set; }
-        public float? Value { get; set; }
+        public double? Value { get; set; }
         public int? Rank { get; set; }
 
         public Player()
