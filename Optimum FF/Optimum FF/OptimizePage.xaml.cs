@@ -157,8 +157,10 @@ namespace Optimum_FF
 
         private void OptimizeButton_Click(object sender, RoutedEventArgs e)
         {
-
             RankQBs();
+            RankWRs();
+            RankRBs();
+            RankTEs();
         }
 
         private void RankQBs()
@@ -196,12 +198,12 @@ namespace Optimum_FF
                                 int interceptions = (int)dr["Int"];
                                 double ypg = (double)dr["YPG"];
 
-                                value = (att / games);
+                                value = (att / games) * .1;
                                 value += ((tds / games) * 6);
                                 value -= ((interceptions / games) * 2);
-                                value += (ypg / 10);
+                                value += (ypg / 20);
 
-                                player.Value = value;
+                                player.Value = Math.Round(value, 3);
                             }
                         }
                         dr.Close();
@@ -220,7 +222,7 @@ namespace Optimum_FF
                 }
             for (int i = 0; i < lineup.Settings.QBCount; i++)
             {
-                restart:
+            restart:
                 foreach (var player in lineup.Players) if (player.Position.Contains("Bench: QB"))
                     {
                         if (player.Rank < lineup.Players[i].Rank)
@@ -228,6 +230,255 @@ namespace Optimum_FF
                             player.Position = "QB";
                             lineup.Players[i].Position = "Bench: QB";
                             lineup.Swap(player, lineup.Players[i]);
+                            goto restart;
+                        }
+                    }
+            }
+            playerList.ItemsSource = lineup.Players;
+            playerList.Items.Refresh();
+        }
+
+        private void RankWRs()
+        {
+            List<Player> wrs;
+            wrs = masterList.Players.FindAll(x => x.Position == "WR");
+
+            foreach (var player in wrs)
+            {
+                //Create SQL connection
+                string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
+                using (var conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    var sql = "SELECT * FROM WRs WHERE Player=@Player";
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Player", player.Name);
+                        SqlDataReader dr = cmd.ExecuteReader();
+
+                        //Read QB Data
+                        while (dr.Read())
+                        {
+                            //Get Player info
+                            string name = dr["Player"].ToString();
+
+                            //Check if player is null
+                            if (name == player.Name)
+                            {
+                                double value = 0;
+
+                                int games = (int)dr["Games"];
+                                double rcpg = (double)dr["RCPG"];
+                                int rctds = (int)dr["RCTDs"];
+                                int rutds = (int)dr["RUTDs"];
+                                int fmb = (int)dr["RCFmb"];
+                                if (fmb == 0)
+                                {
+                                    fmb = (int)dr["RUFmb"];
+                                }
+                                double rcypg = (double)dr["RCYPG"];
+                                double ruypg = (double)dr["RUYPG"];
+
+                                if (lineup.Settings.LeagueType == "PPR")
+                                {
+                                    value += rcpg;
+                                }
+                                value += (((rctds + rutds) / games) * 6);
+                                value -= ((fmb / games) * 2);
+                                value += ((rcypg + ruypg) / 10);
+
+                                player.Value = Math.Round(value, 3);
+                            }
+                        }
+                        dr.Close();
+                    }
+                }
+            }
+            wrs = wrs.OrderBy(x => x.Value).ToList();
+            for (int i = wrs.Count() - 1; i >= 0; i--)
+            {
+                wrs[i].Rank = wrs.Count() - i;
+            }
+            foreach (var player in lineup.Players) if (player.Position.EndsWith("WR"))
+                {
+                    player.Value = wrs.Find(x => x.Name.Contains(player.Name)).Value;
+                    player.Rank = wrs.Find(x => x.Name.Contains(player.Name)).Rank;
+                }
+            for (int i = 0; i < lineup.Settings.WRCount; i++)
+            {
+                int currentPlayer = lineup.Settings.QBCount + i;
+            restart:
+                foreach (var player in lineup.Players) if (player.Position.Contains("Bench: WR"))
+                    {
+                        if (player.Rank < lineup.Players[currentPlayer].Rank)
+                        {
+                            player.Position = "WR";
+                            lineup.Players[currentPlayer].Position = "Bench: WR";
+                            lineup.Swap(player, lineup.Players[currentPlayer]);
+                            goto restart;
+                        }
+                    }
+            }
+            playerList.ItemsSource = lineup.Players;
+            playerList.Items.Refresh();
+        }
+
+        private void RankRBs()
+        {
+            List<Player> rbs;
+            rbs = masterList.Players.FindAll(x => x.Position == "RB");
+
+            foreach (var player in rbs)
+            {
+                //Create SQL connection
+                string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
+                using (var conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    var sql = "SELECT * FROM RBs WHERE Player=@Player";
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Player", player.Name);
+                        SqlDataReader dr = cmd.ExecuteReader();
+
+                        //Read QB Data
+                        while (dr.Read())
+                        {
+                            //Get Player info
+                            string name = dr["Player"].ToString();
+
+                            //Check if player is null
+                            if (name == player.Name)
+                            {
+                                double value = 0;
+
+                                int games = (int)dr["Games"];
+                                double rcpg = (double)dr["RCPG"];
+                                int rctds = (int)dr["RCTDs"];
+                                int rutds = (int)dr["RUTDs"];
+                                int fmb = (int)dr["RCFmb"];
+                                if (fmb == 0)
+                                {
+                                    fmb = (int)dr["RUFmb"];
+                                }
+                                double rcypg = (double)dr["RCYPG"];
+                                double ruypg = (double)dr["RUYPG"];
+
+                                if (lineup.Settings.LeagueType == "PPR")
+                                {
+                                    value += rcpg;
+                                }
+                                value += (((rctds + rutds) / games) * 6);
+                                value -= ((fmb / games) * 2);
+                                value += ((rcypg + ruypg) / 10);
+
+                                player.Value = Math.Round(value, 3);
+                            }
+                        }
+                        dr.Close();
+                    }
+                }
+            }
+            rbs = rbs.OrderBy(x => x.Value).ToList();
+            for (int i = rbs.Count() - 1; i >= 0; i--)
+            {
+                rbs[i].Rank = rbs.Count() - i;
+            }
+            foreach (var player in lineup.Players) if (player.Position.EndsWith("RB"))
+                {
+                    player.Value = rbs.Find(x => x.Name.Contains(player.Name)).Value;
+                    player.Rank = rbs.Find(x => x.Name.Contains(player.Name)).Rank;
+                }
+            for (int i = 0; i < lineup.Settings.RBCount; i++)
+            {
+                int currentPlayer = lineup.Settings.QBCount + lineup.Settings.WRCount + i;
+            restart:
+                foreach (var player in lineup.Players) if (player.Position.Contains("Bench: RB"))
+                    {
+                        if (player.Rank < lineup.Players[currentPlayer].Rank)
+                        {
+                            player.Position = "RB";
+                            lineup.Players[currentPlayer].Position = "Bench: RB";
+                            lineup.Swap(player, lineup.Players[currentPlayer]);
+                            goto restart;
+                        }
+                    }
+            }
+            playerList.ItemsSource = lineup.Players;
+            playerList.Items.Refresh();
+        }
+
+        private void RankTEs()
+        {
+            List<Player> tes;
+            tes = masterList.Players.FindAll(x => x.Position == "TE");
+
+            foreach (var player in tes)
+            {
+                //Create SQL connection
+                string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
+                using (var conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    var sql = "SELECT * FROM TEs WHERE Player=@Player";
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Player", player.Name);
+                        SqlDataReader dr = cmd.ExecuteReader();
+
+                        //Read QB Data
+                        while (dr.Read())
+                        {
+                            //Get Player info
+                            string name = dr["Player"].ToString();
+
+                            //Check if player is null
+                            if (name == player.Name)
+                            {
+                                double value = 0;
+
+                                int games = (int)dr["Games"];
+                                double rcpg = (double)dr["RCPG"];
+                                int rctds = (int)dr["RCTDs"];
+                                int fmb = (int)dr["RCFmb"];
+                                double rcypg = (double)dr["RCYPG"];
+
+                                if (lineup.Settings.LeagueType == "PPR")
+                                {
+                                    value += rcpg;
+                                }
+                                value += ((rctds / games) * 6);
+                                value -= ((fmb / games) * 2);
+                                value += (rcypg / 10);
+
+                                player.Value = Math.Round(value, 3);
+                            }
+                        }
+                        dr.Close();
+                    }
+                }
+            }
+            tes = tes.OrderBy(x => x.Value).ToList();
+            for (int i = tes.Count() - 1; i >= 0; i--)
+            {
+                tes[i].Rank = tes.Count() - i;
+            }
+            foreach (var player in lineup.Players) if (player.Position.EndsWith("TE"))
+                {
+                    player.Value = tes.Find(x => x.Name.Contains(player.Name)).Value;
+                    player.Rank = tes.Find(x => x.Name.Contains(player.Name)).Rank;
+                }
+            for (int i = 0; i < lineup.Settings.TECount; i++)
+            {
+                int currentPlayer = lineup.Settings.QBCount + lineup.Settings.WRCount + lineup.Settings.RBCount + i;
+            restart:
+                foreach (var player in lineup.Players) if (player.Position.Contains("Bench: TE"))
+                    {
+                        if (player.Rank < lineup.Players[currentPlayer].Rank)
+                        {
+                            player.Position = "TE";
+                            lineup.Players[currentPlayer].Position = "Bench: TE";
+                            lineup.Swap(player, lineup.Players[currentPlayer]);
                             goto restart;
                         }
                     }

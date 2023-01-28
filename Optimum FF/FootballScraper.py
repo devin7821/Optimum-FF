@@ -85,14 +85,14 @@ def create_wr_table(curr):
                                     CREATE TABLE [dbo].[WRs] (
                                         [Player] [varchar](50) NOT NULL,
                                         [Team] [varchar](50) NOT NULL,
-                                        [Games] [int] NULL,
-                                        [RCPG] [float] NULL,
-                                        [RCTDs] [int] NULL,
-                                        [RUTDs] [int] NULL,
-                                        [RCFmb] [int] NULL,
-                                        [RUFmb] [int] NULL,
-                                        [RCYPG] [float] NULL,
-                                        [RUYPG] [float] NULL)""")
+                                        [Games] [int] NOT NULL,
+                                        [RCPG] [float] NOT NULL,
+                                        [RCTDs] [int] NOT NULL,
+                                        [RUTDs] [int] NOT NULL,
+                                        [RCFmb] [int] NOT NULL,
+                                        [RUFmb] [int] NOT NULL,
+                                        [RCYPG] [float] NOT NULL,
+                                        [RUYPG] [float] NOT NULL)""")
         curr.execute(create_table_command)
 
 def create_rb_table(curr):
@@ -100,14 +100,14 @@ def create_rb_table(curr):
                                     CREATE TABLE [dbo].[RBs] (
                                         [Player] [varchar](50) NOT NULL,
                                         [Team] [varchar](50) NOT NULL,
-                                        [Games] [int] NULL,
-                                        [RCPG] [float] NULL,
-                                        [RCTDs] [int] NULL,
-                                        [RUTDs] [int] NULL,
-                                        [RCFmb] [int] NULL,
-                                        [RUFmb] [int] NULL,
-                                        [RCYPG] [float] NULL,
-                                        [RUYPG] [float] NULL)""")
+                                        [Games] [int] NOT NULL,
+                                        [RCPG] [float] NOT NULL,
+                                        [RCTDs] [int] NOT NULL,
+                                        [RUTDs] [int] NOT NULL,
+                                        [RCFmb] [int] NOT NULL,
+                                        [RUFmb] [int] NOT NULL,
+                                        [RCYPG] [float] NOT NULL,
+                                        [RUYPG] [float] NOT NULL)""")
         curr.execute(create_table_command)
         
 def create_te_table(curr):
@@ -115,11 +115,11 @@ def create_te_table(curr):
                                     CREATE TABLE [dbo].[TEs] (
                                         [Player] [varchar](50) NOT NULL,
                                         [Team] [varchar](50) NOT NULL,
-                                        [Games] [int] NULL,
-                                        [RCPG] [float] NULL,
-                                        [RCTDs] [int] NULL,
-                                        [RCFmb] [int] NULL,
-                                        [RCYPG] [float] NULL)""")
+                                        [Games] [int] NOT NULL,
+                                        [RCPG] [float] NOT NULL,
+                                        [RCTDs] [int] NOT NULL,
+                                        [RCFmb] [int] NOT NULL,
+                                        [RCYPG] [float] NOT NULL)""")
         curr.execute(create_table_command)
         
 def create_dp_table(curr):
@@ -183,14 +183,15 @@ def AddGames(cursor, cnxn):
     for index, row in stats.iterrows():
         if str(row.Week).isnumeric():
             insert_into_games = ("""INSERT INTO Games (Week, Home, Away) values(?,?,?);""")
-            if row.Location is None:
-                if not check_if_game_exists(cursor, teams[str(row.Winnerbtie)], teams[str(row.Loserbtie)]):
-                    game_to_insert = ([int(row.Week), teams[str(row.Winnerbtie)], teams[str(row.Loserbtie)]])
-                    cursor.execute(insert_into_games, game_to_insert)
-            else:
+            print(row)
+            if row.Location == "@":
                 if not check_if_game_exists(cursor, teams[str(row.Loserbtie)], teams[str(row.Winnerbtie)]):
                     game_to_insert = ([int(row.Week), teams[str(row.Loserbtie)], teams[str(row.Winnerbtie)]])
                     cursor.execute(insert_into_games, game_to_insert)
+            else:
+                if not check_if_game_exists(cursor, teams[str(row.Winnerbtie)], teams[str(row.Loserbtie)]):
+                    game_to_insert = ([int(row.Week), teams[str(row.Winnerbtie)], teams[str(row.Loserbtie)]])
+                    cursor.execute(insert_into_games, game_to_insert)          
 
     cnxn.commit()
 
@@ -362,16 +363,16 @@ def AddReceiving(cursor, cnxn):
             if check_if_exists(cursor, row.Player, "WRs"):
                 update_wr_row(cursor, row)
             else:
-                insert_into_wrs = ("""INSERT INTO WRs (Player, Team, Games, RCPG, RCTDs, RCFmb, RCYPG) values(?,?,?,?,?,?,?);""")
-                wr_to_insert = ([str(row.Player), str(row.Tm), int(row.G), float(row.RbG), int(row.TD), int(row.Fmb), float(row.YbG)])
+                insert_into_wrs = ("""INSERT INTO WRs (Player, Team, Games, RCPG, RCTDs, RUTDs, RCFmb, RUFmb, RCYPG, RUYPG) values(?,?,?,?,?,?,?,?,?,?);""")
+                wr_to_insert = ([str(row.Player), str(row.Tm), int(row.G), float(row.RbG), int(row.TD), 0, int(row.Fmb), 0, float(row.YbG), 0])
                 cursor.execute(insert_into_wrs, wr_to_insert)
                 
         if row.Pos == "RB":
             if check_if_exists(cursor, row.Player, "RBs"):
                 update_rb_row(cursor, row)
             else:
-                insert_into_rbs = ("""INSERT INTO RBs (Player, Team, Games, RCPG, RCTDs, RCFmb, RCYPG) values(?,?,?,?,?,?,?);""")
-                rb_to_insert = ([str(row.Player), str(row.Tm), int(row.G), float(row.RbG), int(row.TD), int(row.Fmb), float(row.YbG)])
+                insert_into_rbs = ("""INSERT INTO RBs (Player, Team, Games, RCPG, RCTDs, RUTDs, RCFmb, RUFmb, RCYPG, RUYPG) values(?,?,?,?,?,?,?,?,?,?);""")
+                rb_to_insert = ([str(row.Player), str(row.Tm), int(row.G), float(row.RbG), int(row.TD), 0, int(row.Fmb), 0, float(row.YbG), 0])
                 cursor.execute(insert_into_rbs, rb_to_insert)
                 
         if row.Pos == "TE":
@@ -440,16 +441,16 @@ def AddRushing(cursor, cnxn):
             if check_if_exists(cursor, row.Player, "WRs"):
                 update_wr_rushing_row(cursor, row)
             else:
-                insert_into_wrs = ("""INSERT INTO WRs (Player, Team, Games, RUTDs, RUFmb, RUYPG) values(?,?,?,?,?,?);""")
-                wr_to_insert = ([str(row.Player), str(row.Tm), int(row.G), int(row.TD), int(row.Fmb), float(row.YbG)])
+                insert_into_wrs = ("""INSERT INTO WRs (Player, Team, Games, RCPG, RCTDs, RUTDs, RCFmb, RUFmb, RCYPG, RUYPG) values(?,?,?,?,?,?,?,?,?,?);""")
+                wr_to_insert = ([str(row.Player), str(row.Tm), int(row.G), 0, 0, int(row.TD), 0, int(row.Fmb), 0, float(row.YbG)])
                 cursor.execute(insert_into_wrs, wr_to_insert)
                 
         if row.Pos == "RB":
             if check_if_exists(cursor, row.Player, "RBs"):
                 update_rb_rushing_row(cursor, row)
             else:
-                insert_into_rbs = ("""INSERT INTO RBs (Player, Team, Games, RUTDs, RUFmb, RUYPG) values(?,?,?,?,?,?);""")
-                rb_to_insert = ([str(row.Player), str(row.Tm), int(row.G), int(row.TD), int(row.Fmb), float(row.YbG)])
+                insert_into_rbs = ("""INSERT INTO RBs (Player, Team, Games, RCPG, RCTDs, RUTDs, RCFmb, RUFmb, RCYPG, RUYPG) values(?,?,?,?,?,?,?,?,?,?);""")
+                rb_to_insert = ([str(row.Player), str(row.Tm), int(row.G), 0, 0, int(row.TD), 0, int(row.Fmb), 0, float(row.YbG)])
                 cursor.execute(insert_into_rbs, rb_to_insert)
 
     cnxn.commit()
@@ -504,7 +505,7 @@ def AddDPs(cursor, cnxn):
     cnxn.commit()
 
 def main():
-    connectionString = str(sys.argv[1])
+    connectionString = "SERVER=offsqlserver.database.windows.net;DATABASE=OFF;UID=mainuser;PWD=optimumfootball3!"#str(sys.argv[1])
     #Create DB Connection
     cnxn = pyodbc.connect('DRIVER={SQL Server};' + connectionString)
     cursor = cnxn.cursor()
