@@ -162,6 +162,7 @@ namespace Optimum_FF
             RankRBs();
             RankTEs();
             RankDEFs();
+            RankDPs();
         }
 
         private void RankQBs()
@@ -194,9 +195,9 @@ namespace Optimum_FF
                                 double value = 0;
 
                                 int games = (int)dr["Games"];
-                                int att = (int)dr["Att"];
-                                int tds = (int)dr["TDs"];
-                                int interceptions = (int)dr["Int"];
+                                double att = (int)dr["Att"];
+                                double tds = (int)dr["TDs"];
+                                double interceptions = (int)dr["Int"];
                                 double ypg = (double)dr["YPG"];
 
                                 value = (att / games) * .1;
@@ -270,9 +271,9 @@ namespace Optimum_FF
 
                                 int games = (int)dr["Games"];
                                 double rcpg = (double)dr["RCPG"];
-                                int rctds = (int)dr["RCTDs"];
-                                int rutds = (int)dr["RUTDs"];
-                                int fmb = (int)dr["RCFmb"];
+                                double rctds = (int)dr["RCTDs"];
+                                double rutds = (int)dr["RUTDs"];
+                                double fmb = (int)dr["RCFmb"];
                                 if (fmb == 0)
                                 {
                                     fmb = (int)dr["RUFmb"];
@@ -355,9 +356,9 @@ namespace Optimum_FF
 
                                 int games = (int)dr["Games"];
                                 double rcpg = (double)dr["RCPG"];
-                                int rctds = (int)dr["RCTDs"];
-                                int rutds = (int)dr["RUTDs"];
-                                int fmb = (int)dr["RCFmb"];
+                                double rctds = (int)dr["RCTDs"];
+                                double rutds = (int)dr["RUTDs"];
+                                double fmb = (int)dr["RCFmb"];
                                 if (fmb == 0)
                                 {
                                     fmb = (int)dr["RUFmb"];
@@ -440,8 +441,8 @@ namespace Optimum_FF
 
                                 int games = (int)dr["Games"];
                                 double rcpg = (double)dr["RCPG"];
-                                int rctds = (int)dr["RCTDs"];
-                                int fmb = (int)dr["RCFmb"];
+                                double rctds = (int)dr["RCTDs"];
+                                double fmb = (int)dr["RCFmb"];
                                 double rcypg = (double)dr["RCYPG"];
 
                                 if (lineup.Settings.LeagueType == "PPR")
@@ -518,20 +519,21 @@ namespace Optimum_FF
                                 double value = 0;
 
                                 int games = (int)dr["Games"];
-                                int ptd = (int)dr["PTD"];
-                                int rtd = (int)dr["RTD"];
-                                int to = (int)dr["Turnovers"];
-                                int interceptions = (int)dr["Int"];
-                                int fumbles = to - interceptions;
+                                double ptd = (int)dr["PTD"];
+                                double rtd = (int)dr["RTD"];
+                                double to = (int)dr["Turnovers"];
+                                double interceptions = (int)dr["Int"];
+                                double fumbles = to - interceptions;
 
                                 if (((ptd + rtd) / games) > 2)
                                 {
-                                    value -= ((ptd + rtd) / games) * 2;
+                                    value -= (((ptd + rtd) / games) * 2);
                                 }
                                 else
                                 {
                                     value += 15;
                                 }
+                                double temp = (to / games) * 2.0;
                                 value += ((to / games) * 2);
 
                                 team.Value = Math.Round(value, 3);
@@ -561,6 +563,81 @@ namespace Optimum_FF
                         {
                             player.Position = "DEF";
                             lineup.Players[currentPlayer].Position = "Bench: DEF";
+                            lineup.Swap(player, lineup.Players[currentPlayer]);
+                            goto restart;
+                        }
+                    }
+            }
+            playerList.ItemsSource = lineup.Players;
+            playerList.Items.Refresh();
+        }
+
+        private void RankDPs()
+        {
+            List<Player> dps;
+            dps = masterList.Players.FindAll(x => x.Position == "DP");
+
+            foreach (var player in dps)
+            {
+                //Create SQL connection
+                string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
+                using (var conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    var sql = "SELECT * FROM DPs WHERE Player=@Player";
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Player", player.Name);
+                        SqlDataReader dr = cmd.ExecuteReader();
+
+                        //Read QB Data
+                        while (dr.Read())
+                        {
+                            //Get Player info
+                            string name = dr["Player"].ToString();
+
+                            //Check if player is null
+                            if (name == player.Name)
+                            {
+                                double value = 0;
+
+                                int games = (int)dr["Games"];
+                                double interceptions = (int)dr["Int"];
+                                double ff = (int)dr["FF"];
+                                double fr = (int)dr["FR"];
+                                double sk = (double)dr["Sk"];
+                                double solo = (int)dr["Solo"];
+
+                                value += ((interceptions + ff)/ games) * 2;
+                                value += ((fr + sk + solo) / games);
+
+                                player.Value = Math.Round(value, 3);
+                            }
+                        }
+                        dr.Close();
+                    }
+                }
+            }
+            dps = dps.OrderBy(x => x.Value).ToList();
+            for (int i = dps.Count() - 1; i >= 0; i--)
+            {
+                dps[i].Rank = dps.Count() - i;
+            }
+            foreach (var player in lineup.Players) if (player.Position.EndsWith("DP"))
+                {
+                    player.Value = dps.Find(x => x.Name.Contains(player.Name)).Value;
+                    player.Rank = dps.Find(x => x.Name.Contains(player.Name)).Rank;
+                }
+            for (int i = 0; i < lineup.Settings.TECount; i++)
+            {
+                int currentPlayer = lineup.Settings.QBCount + lineup.Settings.WRCount + lineup.Settings.RBCount + lineup.Settings.TECount + lineup.Settings.KCount + lineup.Settings.DEFCount + i;
+            restart:
+                foreach (var player in lineup.Players) if (player.Position.Contains("Bench: DP"))
+                    {
+                        if (player.Rank < lineup.Players[currentPlayer].Rank)
+                        {
+                            player.Position = "DP";
+                            lineup.Players[currentPlayer].Position = "Bench: DP";
                             lineup.Swap(player, lineup.Players[currentPlayer]);
                             goto restart;
                         }
