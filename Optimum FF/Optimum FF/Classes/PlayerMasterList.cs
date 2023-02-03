@@ -23,6 +23,13 @@ namespace Optimum_FF
             GetWRs(Players, Teams);
             GetTEs(Players, Teams);
             GetDPs(Players, Teams);
+            foreach (var team in Teams)
+            {
+                Player player = new Player();
+                player.Name = team.Name;
+                player.Position = "DEF";
+                Players.Add(player);
+            }
         }
 
         private List<Team> GetTeams()

@@ -161,6 +161,7 @@ namespace Optimum_FF
             RankWRs();
             RankRBs();
             RankTEs();
+            RankDEFs();
         }
 
         private void RankQBs()
@@ -478,6 +479,88 @@ namespace Optimum_FF
                         {
                             player.Position = "TE";
                             lineup.Players[currentPlayer].Position = "Bench: TE";
+                            lineup.Swap(player, lineup.Players[currentPlayer]);
+                            goto restart;
+                        }
+                    }
+            }
+            playerList.ItemsSource = lineup.Players;
+            playerList.Items.Refresh();
+        }
+
+        private void RankDEFs()
+        {
+            List<Team> defs;
+            defs = masterList.Teams;
+
+            foreach (var team in defs)
+            {
+                //Create SQL connection
+                string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
+                using (var conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    var sql = "SELECT * FROM Teams WHERE Team=@Team";
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Team", team.Name);
+                        SqlDataReader dr = cmd.ExecuteReader();
+
+                        //Read QB Data
+                        while (dr.Read())
+                        {
+                            //Get Player info
+                            string name = dr["Team"].ToString();
+
+                            //Check if player is null
+                            if (name == team.Name)
+                            {
+                                double value = 0;
+
+                                int games = (int)dr["Games"];
+                                int ptd = (int)dr["PTD"];
+                                int rtd = (int)dr["RTD"];
+                                int to = (int)dr["Turnovers"];
+                                int interceptions = (int)dr["Int"];
+                                int fumbles = to - interceptions;
+
+                                if (((ptd + rtd) / games) > 2)
+                                {
+                                    value -= ((ptd + rtd) / games) * 2;
+                                }
+                                else
+                                {
+                                    value += 15;
+                                }
+                                value += ((to / games) * 2);
+
+                                team.Value = Math.Round(value, 3);
+                            }
+                        }
+                        dr.Close();
+                    }
+                }
+            }
+            defs = defs.OrderBy(x => x.Value).ToList();
+            for (int i = defs.Count() - 1; i >= 0; i--)
+            {
+                defs[i].Rank = defs.Count() - i;
+            }
+            foreach (var player in lineup.Players) if (player.Position.EndsWith("DEF"))
+                {
+                    player.Value = defs.Find(x => x.Name.Contains(player.Name)).Value;
+                    player.Rank = defs.Find(x => x.Name.Contains(player.Name)).Rank;
+                }
+            for (int i = 0; i < lineup.Settings.DEFCount; i++)
+            {
+                int currentPlayer = lineup.Settings.QBCount + lineup.Settings.WRCount + lineup.Settings.RBCount + lineup.Settings.TECount + lineup.Settings.KCount + i;
+            restart:
+                foreach (var player in lineup.Players) if (player.Position.Contains("Bench: DEF"))
+                    {
+                        if (player.Rank < lineup.Players[currentPlayer].Rank)
+                        {
+                            player.Position = "DEF";
+                            lineup.Players[currentPlayer].Position = "Bench: DEF";
                             lineup.Swap(player, lineup.Players[currentPlayer]);
                             goto restart;
                         }

@@ -10,6 +10,8 @@ namespace Optimum_FF
     {
         public string? Name { get; set; }
         public string? Opponent { get; set; }
+        public double? Value { get; set; }
+        public int? Rank { get; set; } 
 
         public Team()
         {

@@ -183,7 +183,6 @@ def AddGames(cursor, cnxn):
     for index, row in stats.iterrows():
         if str(row.Week).isnumeric():
             insert_into_games = ("""INSERT INTO Games (Week, Home, Away) values(?,?,?);""")
-            print(row)
             if row.Location == "@":
                 if not check_if_game_exists(cursor, teams[str(row.Loserbtie)], teams[str(row.Winnerbtie)]):
                     game_to_insert = ([int(row.Week), teams[str(row.Loserbtie)], teams[str(row.Winnerbtie)]])
@@ -210,7 +209,7 @@ def AddTeams(cursor, cnxn):
                         Turnovers = ?,
                         Int = ?
                     WHERE Team = ?;""")
-        vars = ([int(row.G), int(row[11]), int(row[17]), int(row.TO), int(row.Int), teams[str(row.Tm)]])
+        vars = ([int(row.G), int(row[12]), int(row[18]), int(row.TO), int(row.Int), teams[str(row.Tm)]])
         curr.execute(query, vars)
 
     #QB Scrape Info    
