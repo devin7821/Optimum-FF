@@ -4,15 +4,22 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Optimum_FF"
+      xmlns:controls='clr-namespace:System.Windows.Controls;assembly=DotNetProjects.Input.Toolkit'
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="OptimizePage">
-    
+
     <ScrollViewer>
         <StackPanel>
-            <Button HorizontalAlignment="Left" VerticalAlignment="Top" Height="45" Width="100" Click="Back">Back</Button>
-            <Label HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 -45 0 0" FontWeight="Bold" FontSize="24" >Optimize</Label>
+            <controls:AutoCompleteBox x:Name="search" Height="40"></controls:AutoCompleteBox>
+            <Button x:Name="AddPlayer" HorizontalAlignment="Right" Width="100" Height="40" Margin="0 -40 0 0" Click="AddPlayer_Click">Add</Button>
+            <Label HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" FontSize="24" >Optimize</Label>
             <ListBox Name="playerList">
+                <ListBox.Resources>
+                    <DataTemplate x:Key="PlayerTemplate">
+                        <TextBlock Text="{Binding Name}"></TextBlock>
+                    </DataTemplate>
+                </ListBox.Resources>
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="IsEnabled" Value="False"/>
@@ -20,9 +27,13 @@
                         <Setter Property="BorderBrush" Value="Black"/>
                         <Setter Property="HorizontalAlignment" Value="Center"/>
                         <Setter Property="Width" Value="200"/>
+                        <Setter Property="Height" Value="75"/>
                     </Style>
                 </ListBox.ItemContainerStyle>
             </ListBox>
+            <Button x:Name="OptimizeButton" HorizontalAlignment="Center" Margin="0 10 0 0" Height="50" Width="100" Click="OptimizeButton_Click">Optimize</Button>
+            <Button x:Name="SettingsButton" HorizontalAlignment="Center" Margin="0 5 0 0" Height="50" Width="100" Click="SettingsButton_Click">Settings</Button>
+            <Button HorizontalAlignment="Center" Margin="0 5 0 0" Height="50" Width="100">Export</Button>
         </StackPanel>
     </ScrollViewer>
 </Page>
