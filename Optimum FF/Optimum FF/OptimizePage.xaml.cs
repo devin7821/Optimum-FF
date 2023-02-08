@@ -742,5 +742,11 @@ namespace Optimum_FF
             playerList.ItemsSource = lineup.Players;
             playerList.Items.Refresh();
         }
+
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow?.ChangeView(new SettingsPage());
+        }
     }
 }
