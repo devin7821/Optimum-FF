@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -25,8 +26,22 @@ namespace Optimum_FF
         public MainWindow()
         {
             InitializeComponent();
+
+            //Process proc = new Process();
+            //DirectoryInfo dirInfo = Directory.GetParent(Directory.GetCurrentDirectory());
+            //string path = @dirInfo.Parent.Parent.ToString();
+            //path += @"\dist\FootballScraper\FootballScraper.exe";
+            //proc.StartInfo.FileName = path;
+            //proc.StartInfo.Arguments = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
+            //proc.StartInfo.UseShellExecute = false;
+            //proc.StartInfo.CreateNoWindow = true;
+            //proc.Start();
+
             Application.Current.MainWindow = this;
             Loaded += OnMainMenuLoaded;
+
+            //proc.WaitForExit(1000 * 60 * 10);
+            //Debug.WriteLine("Script done");
         }
 
         private void OnMainMenuLoaded(object sender, RoutedEventArgs e)
