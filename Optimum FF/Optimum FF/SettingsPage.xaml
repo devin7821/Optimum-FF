@@ -11,6 +11,16 @@
     <ScrollViewer>
         <StackPanel>
             <Label HorizontalAlignment="Center" FontWeight="Bold" FontSize="35">Settings</Label>
+            <ComboBox x:Name="LeagueTypeSelection" HorizontalAlignment="Center" Width="200">
+                <ComboBoxItem Content="Standard"></ComboBoxItem>
+                <ComboBoxItem Content="PPR"></ComboBoxItem>
+            </ComboBox>
+            <Label HorizontalAlignment="center" Margin="0 10 300 0">QB Starters:</Label>
+            <ComboBox x:Name="QBCountSelection" HorizontalAlignment="Center" Width="200" Margin="0 -23 0 10">
+                <ComboBoxItem Content="1"></ComboBoxItem>
+                <ComboBoxItem Content="2"></ComboBoxItem>
+                <ComboBoxItem Content="3"></ComboBoxItem>
+            </ComboBox>
         </StackPanel>
     </ScrollViewer>
 </Page>
