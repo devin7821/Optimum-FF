@@ -24,6 +24,11 @@ namespace Optimum_FF
             GetTEs(Players, Teams);
             GetDPs(Players, Teams);
             GetKs(Players, Teams);
+            foreach (var player in Players)
+            {
+                var names = player.Name.Split(' ');
+                player.Name = (names[1] + " " + names[0]);
+            }
             foreach (var team in Teams)
             {
                 Player player = new Player();

@@ -133,7 +133,8 @@ namespace Optimum_FF
                         {
                             if (lineup.Players[i].Name == "" && (lineup.Players[i].Position == player.Position || lineup.Players[i].Position == "Bench"))
                             {
-                                lineup.Players[i].Name = player.Name;
+                                var names = player.Name.Split(' ');
+                                lineup.Players[i].Name = names[1] + " " + names[0];
                                 lineup.Players[i].Team = player.Team;
                                 if (lineup.Players[i].Position == "Bench")
                                 {
@@ -157,6 +158,11 @@ namespace Optimum_FF
 
         private void OptimizeButton_Click(object sender, RoutedEventArgs e)
         {
+            foreach (var player in masterList.Players) if (player.Name.Length > 3)
+                {
+                    var names = player.Name.Split(' ');
+                    player.Name = (names[1] + " " + names[0]);
+                }
             RankQBs();
             RankWRs();
             RankRBs();
@@ -164,6 +170,11 @@ namespace Optimum_FF
             RankDEFs();
             RankDPs();
             RankKs();
+            foreach (var player in masterList.Players) if (player.Name.Length > 3)
+                {
+                    var names = player.Name.Split(' ');
+                    player.Name = (names[1] + " " + names[0]);
+                }
         }
 
         private void RankQBs()
@@ -531,7 +542,7 @@ namespace Optimum_FF
                                 {
                                     value -= ((twfga / twfgm) / games) * 2;
                                 }
-                                
+
                                 value += (twfgm / games) * 3;
                                 value += (thfg / games) * 3;
                                 value += (frfg / games) * 4;
