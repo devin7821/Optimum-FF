@@ -19,5 +19,20 @@ namespace Optimum_FF
         public int DPCount { get; set; }
         public int FlexCount { get; set; }
         public int BenchCount { get; set; }
+
+        public Settings()
+        {
+            LeagueType = "Standard";
+            QBCount = 1;
+            WRCount = 3;
+            RBCount = 2;
+            TECount = 1;
+            FlexCount = 0;
+            KCount = 1;
+            DEFCount = 1;
+            DPCount = 1;
+            BenchCount = 6;
+            TotalCount = 15;
+        }
     }
 }

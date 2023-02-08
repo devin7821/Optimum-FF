@@ -24,12 +24,13 @@ namespace Optimum_FF
     public partial class OptimizePage : Page
     {
         PlayerMasterList masterList = new PlayerMasterList();
-        Lineup lineup = new Lineup();
+        Lineup lineup;
         //Add kickers to scrape
-        public OptimizePage()
+        public OptimizePage(Settings settings)
         {
             InitializeComponent();
 
+            lineup = new Lineup(settings);
             this.playerList.ItemsSource = lineup.Players;
 
 
