@@ -23,6 +23,7 @@ namespace Optimum_FF
             GetWRs(Players, Teams);
             GetTEs(Players, Teams);
             GetDPs(Players, Teams);
+            GetKs(Players, Teams);
             foreach (var team in Teams)
             {
                 Player player = new Player();
@@ -257,6 +258,46 @@ namespace Optimum_FF
                                 }
                             }
                             player.Position = "DP";
+                            players.Add(player);
+                        }
+                    }
+                    dr.Close();
+                }
+            }
+        }
+
+        private void GetKs(List<Player> players, List<Team> teams)
+        {
+            //Create SQL connection
+            string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                var sql = "SELECT * FROM Ks";
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    SqlDataReader dr = cmd.ExecuteReader();
+
+                    //Read QB Data
+                    while (dr.Read())
+                    {
+                        //Get Player info
+                        string name = dr["Player"].ToString();
+
+                        //Check if player is null
+                        if (name != null)
+                        {
+                            Player player = new Player();
+                            player.Name = name;
+                            string teamName = dr["Team"].ToString();
+                            foreach (var team in teams)
+                            {
+                                if (team.Name == teamName)
+                                {
+                                    player.Team = team;
+                                }
+                            }
+                            player.Position = "K";
                             players.Add(player);
                         }
                     }

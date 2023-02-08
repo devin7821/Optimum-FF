@@ -163,6 +163,7 @@ namespace Optimum_FF
             RankTEs();
             RankDEFs();
             RankDPs();
+            RankKs();
         }
 
         private void RankQBs()
@@ -489,6 +490,90 @@ namespace Optimum_FF
             playerList.Items.Refresh();
         }
 
+        private void RankKs()
+        {
+            List<Player> ks;
+            ks = masterList.Players.FindAll(x => x.Position == "K");
+
+            foreach (var player in ks)
+            {
+                //Create SQL connection
+                string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
+                using (var conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    var sql = "SELECT * FROM Ks WHERE Player=@Player";
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Player", player.Name);
+                        SqlDataReader dr = cmd.ExecuteReader();
+
+                        //Read QB Data
+                        while (dr.Read())
+                        {
+                            //Get Player info
+                            string name = dr["Player"].ToString();
+
+                            //Check if player is null
+                            if (name == player.Name)
+                            {
+                                double value = 0;
+
+                                double games = (int)dr["Games"];
+                                double twfga = (int)dr["TwentyFGA"];
+                                double twfgm = (int)dr["TwentyFGM"];
+                                double thfg = (int)dr["ThirtyFG"];
+                                double frfg = (int)dr["FourtyFG"];
+                                double fvfg = (int)dr["FiftyFG"];
+                                double xp = (int)dr["XP"];
+
+                                if (twfgm / twfga > 1)
+                                {
+                                    value -= ((twfga / twfgm) / games) * 2;
+                                }
+                                
+                                value += (twfgm / games) * 3;
+                                value += (thfg / games) * 3;
+                                value += (frfg / games) * 4;
+                                value += (fvfg / games) * 5;
+                                value += (xp / games);
+
+                                player.Value = Math.Round(value, 3);
+                            }
+                        }
+                        dr.Close();
+                    }
+                }
+            }
+            ks = ks.OrderBy(x => x.Value).ToList();
+            for (int i = ks.Count() - 1; i >= 0; i--)
+            {
+                ks[i].Rank = ks.Count() - i;
+            }
+            foreach (var player in lineup.Players) if (player.Position.EndsWith("K"))
+                {
+                    player.Value = ks.Find(x => x.Name.Contains(player.Name)).Value;
+                    player.Rank = ks.Find(x => x.Name.Contains(player.Name)).Rank;
+                }
+            for (int i = 0; i < lineup.Settings.KCount; i++)
+            {
+                int currentPlayer = lineup.Settings.QBCount + lineup.Settings.WRCount + lineup.Settings.RBCount + lineup.Settings.TECount + i;
+            restart:
+                foreach (var player in lineup.Players) if (player.Position.Contains("Bench: K"))
+                    {
+                        if (player.Rank < lineup.Players[currentPlayer].Rank)
+                        {
+                            player.Position = "K";
+                            lineup.Players[currentPlayer].Position = "Bench: K";
+                            lineup.Swap(player, lineup.Players[currentPlayer]);
+                            goto restart;
+                        }
+                    }
+            }
+            playerList.ItemsSource = lineup.Players;
+            playerList.Items.Refresh();
+        }
+
         private void RankDEFs()
         {
             List<Team> defs;
@@ -608,7 +693,7 @@ namespace Optimum_FF
                                 double sk = (double)dr["Sk"];
                                 double solo = (int)dr["Solo"];
 
-                                value += ((interceptions + ff)/ games) * 2;
+                                value += ((interceptions + ff) / games) * 2;
                                 value += ((fr + sk + solo) / games);
 
                                 player.Value = Math.Round(value, 3);

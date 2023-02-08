@@ -40,7 +40,7 @@ namespace Optimum_FF
             Application.Current.MainWindow = this;
             Loaded += OnMainMenuLoaded;
 
-            //proc.WaitForExit(1000 * 60 * 5);
+            //proc.WaitForExit(1000 * 60 * 10);
             //Debug.WriteLine("Script done");
         }
 

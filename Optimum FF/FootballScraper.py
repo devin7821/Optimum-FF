@@ -134,6 +134,20 @@ def create_dp_table(curr):
                                         [Sk] [float] NOT NULL,
                                         [Solo] [int] NOT NULL)""")
         curr.execute(create_table_command)
+        
+def create_k_table(curr):
+        create_table_command = ("""IF OBJECT_ID(N'dbo.Ks', N'U') IS NULL
+                                    CREATE TABLE [dbo].[Ks] (
+                                        [Player] [varchar](50) NOT NULL,
+                                        [Team] [varchar](50) NOT NULL,
+                                        [Games] [int] NOT NULL,
+                                        [TwentyFGA] [int] NOT NULL,
+                                        [TwentyFGM] [int] NOT NULL,
+                                        [ThirtyFG] [int] NOT NULL,
+                                        [FourtyFG] [int] NOT NULL,
+                                        [FiftyFG] [int] NOT NULL,
+                                        [XP] [int] NOT NULL)""")
+        curr.execute(create_table_command)
 
 def check_if_exists(curr, player, table):
     query = ("""SELECT Player FROM """ + table + """ WHERE Player = ?""")
@@ -493,13 +507,64 @@ def AddDPs(cursor, cnxn):
     stats.columns = stats.columns.str.replace(r"[%]", "p", regex=True)
 
     for index, row in stats.iterrows():
+        if row.Pos not in ["QB","WR","RB","TE","K"]:
+            row.Player = re.sub('[^a-zA-Z. \d\s]', '', row.Player)
+            if check_if_exists(cursor, row.Player, "DPs"):
+                update_dp_row(cursor, row)
+            else:
+                insert_into_dps = ("""INSERT INTO DPs (Player, Team, Games, Int, FF, FR, Sk, Solo) values(?,?,?,?,?,?,?,?);""")
+                dp_to_insert = ([str(row.Player), str(row.Tm), int(row.G), int(row.Int), int(row.FF), int(row.FR), float(row.Sk), int(row.Solo)])
+                cursor.execute(insert_into_dps, dp_to_insert)
+
+    cnxn.commit()
+    
+def AddKs(cursor, cnxn):      
+    def update_k_row(curr, row):
+        query = ("""UPDATE Ks 
+                    SET 
+                        Team = ?,
+                        Games = ?,
+                        TwentyFGA = ?,
+                        TwentyFGM = ?,
+                        ThirtyFG = ?,
+                        FourtyFG = ?,
+                        FiftyFG = ?,
+                        XP = ?
+                    WHERE Player = ?;""")
+        vars = ([str(row.Tm), int(row.G), int(row[8]), int(row[9]), int(row[11]), int(row[13]), int(row[15]), int(row[21]), str(row.Player)])
+        curr.execute(query, vars)
+
+    #QB Scrape Info    
+    url = "https://www.pro-football-reference.com/years/{}/kicking.htm".format(year)
+    html = urlopen(url)
+    soup = BeautifulSoup(html, features="lxml")
+
+    #Get Headers
+    headers = [th.getText() for th in soup.findAll('tr')[1].findAll('th')]
+    headers = headers[1:]
+
+    #Get Rows
+    rows = soup.findAll('tr', class_ = lambda table_rows: table_rows != "thead")
+    player_stats = [[td.getText() for td in rows[i].findAll('td')]
+                    for i in range(len(rows))]
+    player_stats = player_stats[2:]
+
+    #Create DataFrame
+    stats = pd.DataFrame(player_stats, columns = headers)
+    stats.head()
+
+    stats = stats.replace(r'', 0, regex=True)
+    stats.columns = stats.columns.str.replace(r"[/]", "b", regex=True)
+    stats.columns = stats.columns.str.replace(r"[%]", "p", regex=True)
+
+    for index, row in stats.iterrows():
         row.Player = re.sub('[^a-zA-Z. \d\s]', '', row.Player)
-        if check_if_exists(cursor, row.Player, "DPs"):
-            update_dp_row(cursor, row)
+        if check_if_exists(cursor, row.Player, "Ks"):
+            update_k_row(cursor, row)
         else:
-            insert_into_dps = ("""INSERT INTO DPs (Player, Team, Games, Int, FF, FR, Sk, Solo) values(?,?,?,?,?,?,?,?);""")
-            dp_to_insert = ([str(row.Player), str(row.Tm), int(row.G), int(row.Int), int(row.FF), int(row.FR), float(row.Sk), int(row.Solo)])
-            cursor.execute(insert_into_dps, dp_to_insert)
+            insert_into_ks = ("""INSERT INTO Ks (Player, Team, Games, TwentyFGA, TwentyFGM, ThirtyFG, FourtyFG, FiftyFG, XP) values(?,?,?,?,?,?,?,?,?);""")
+            k_to_insert = ([str(row.Player), str(row.Tm), int(row.G), int(row[8]), int(row[9]), int(row[11]), int(row[13]), int(row[15]), int(row[21])])
+            cursor.execute(insert_into_ks, k_to_insert)
 
     cnxn.commit()
 
@@ -517,6 +582,7 @@ def main():
     create_rb_table(cursor)
     create_te_table(cursor)
     create_dp_table(cursor)
+    create_k_table(cursor)
     
     #Add Players to DB
     AddGames(cursor, cnxn)
@@ -525,6 +591,7 @@ def main():
     AddReceiving(cursor, cnxn)
     AddRushing(cursor, cnxn)
     AddDPs(cursor,cnxn)
+    AddKs(cursor,cnxn)
     
     cnxn.commit()
     
