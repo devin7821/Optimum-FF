@@ -41,15 +41,15 @@ namespace Optimum_FF
                 settings.DPCount = int.Parse(DPCountSelection.Text);
                 settings.BenchCount = int.Parse(BenchCountSelection.Text);
                 settings.TotalCount = settings.QBCount + settings.WRCount + settings.RBCount + settings.TECount + settings.FlexCount + settings.KCount +
-                    settings.DEFCount + settings.DPCount + settings.BenchCount;
-
-                var mainWindow = (MainWindow)Application.Current.MainWindow;
-                mainWindow?.ChangeView(new OptimizePage(settings));
+                    settings.DEFCount + settings.DPCount + settings.BenchCount - 1;              
             }
             catch (Exception f)
             {
                 MessageBox.Show("Value not selected!");
+                return;
             }
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow?.ChangeView(new OptimizePage(settings));
         }
     }
 }

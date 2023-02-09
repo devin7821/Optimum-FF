@@ -66,6 +66,13 @@ namespace Optimum_FF
                 }
                 i += j;
                 j = 0;
+                while (j < lineup.Settings.FlexCount)
+                {
+                    lineup.Players[i + j].Position = "Flex";
+                    j++;
+                }
+                i += j;
+                j = 0;
                 while (j < lineup.Settings.KCount)
                 {
                     lineup.Players[i + j].Position = "K";
