@@ -15,6 +15,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Configuration;
 using System.Diagnostics;
+using System.IO;
+using CsvHelper;
+using System.Globalization;
+using Microsoft.Win32;
 
 namespace Optimum_FF
 {
@@ -755,6 +759,31 @@ namespace Optimum_FF
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             mainWindow?.ChangeView(new SettingsPage());
+        }
+
+        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "CSV Spreadsheet|*.csv";
+            dialog.Title = "Save Settings";
+            dialog.ShowDialog();
+
+            if (dialog.FileName != "")
+            {
+                FileStream fs = (FileStream)dialog.OpenFile();
+
+                string columns = "QBCount,WRCount\n";
+                fs.Write(Encoding.ASCII.GetBytes(columns), 0, ASCIIEncoding.ASCII.GetByteCount(columns));
+                string input = lineup.Settings.QBCount + "," + lineup.Settings.WRCount + "\n";
+                fs.Write(Encoding.ASCII.GetBytes(input), 0, ASCIIEncoding.ASCII.GetByteCount(input));
+                fs.Close();
+
+                //using (var writer = new StreamWriter("OFFSettings.csv"))
+                //using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                //{
+                //    csv.WriteRecords(lineup.Players);
+                //}
+            }
         }
     }
 }
