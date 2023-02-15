@@ -145,9 +145,16 @@ namespace Optimum_FF
                         {
                             if (lineup.Players[i].Name == "" && (lineup.Players[i].Position == player.Position || lineup.Players[i].Position == "Bench"))
                             {
-                                var names = player.Name.Split(' ');
-                                lineup.Players[i].Name = names[1] + " " + names[0];
-                                lineup.Players[i].Team = player.Team;
+                                if (player.Name.Length > 3)
+                                {
+                                    var names = player.Name.Split(' ');
+                                    lineup.Players[i].Name = names[1] + " " + names[0];
+                                    lineup.Players[i].Team = player.Team;
+                                }
+                                else
+                                {
+                                    lineup.Players[i].Name = player.Name;
+                                }
                                 if (lineup.Players[i].Position == "Bench")
                                 {
                                     lineup.Players[i].Position = "Bench: " + player.Position;
@@ -772,17 +779,19 @@ namespace Optimum_FF
             {
                 FileStream fs = (FileStream)dialog.OpenFile();
 
-                string columns = "QBCount,WRCount\n";
+                string columns = "QBCount,WRCount,RBCount,TECount,FlexCount,KCount,DEFCount,DPCount,BenchCount,TotalCount,LeagueType\n";
                 fs.Write(Encoding.ASCII.GetBytes(columns), 0, ASCIIEncoding.ASCII.GetByteCount(columns));
-                string input = lineup.Settings.QBCount + "," + lineup.Settings.WRCount + "\n";
+                string input = lineup.Settings.QBCount + "," + lineup.Settings.WRCount + "," + lineup.Settings.RBCount + "," +
+                    lineup.Settings.TECount + "," + lineup.Settings.FlexCount + "," + lineup.Settings.KCount + "," + 
+                    lineup.Settings.DEFCount + "," + lineup.Settings.DPCount + "," + lineup.Settings.BenchCount + "," + 
+                    lineup.Settings.TotalCount + "," + lineup.Settings.LeagueType + "\n";
                 fs.Write(Encoding.ASCII.GetBytes(input), 0, ASCIIEncoding.ASCII.GetByteCount(input));
+                foreach (var player in lineup.Players)
+                {
+                    input = player.Name + "," + player.Position + "," + player.Team.Name + "\n";
+                    fs.Write(Encoding.ASCII.GetBytes(input), 0, ASCIIEncoding.ASCII.GetByteCount(input));
+                }
                 fs.Close();
-
-                //using (var writer = new StreamWriter("OFFSettings.csv"))
-                //using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-                //{
-                //    csv.WriteRecords(lineup.Players);
-                //}
             }
         }
     }
