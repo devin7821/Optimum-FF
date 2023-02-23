@@ -101,6 +101,7 @@
                 <ComboBoxItem Content="10"></ComboBoxItem>
             </ComboBox>
             <Button x:Name="DoneButton" HorizontalAlignment="Center" Width="75" Click="DoneButton_Click">Done</Button>
+            <Button x:Name="ImportButton" HorizontalAlignment="Center" Width="75" Click="ImportButton_Click">Done</Button>
         </StackPanel>
     </ScrollViewer>
 </Page>

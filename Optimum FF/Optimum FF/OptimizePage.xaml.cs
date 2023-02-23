@@ -114,6 +114,22 @@ namespace Optimum_FF
             }
             search.ItemsSource = players;
         }
+        public OptimizePage(Lineup Lineup)
+        {
+            InitializeComponent();
+
+            lineup = Lineup;
+            this.playerList.ItemsSource = lineup.Players;
+
+            playerList.Items.Refresh();
+
+            var players = new string[masterList.Players.Count()];
+            for (int j = 0; j < players.Count(); j++)
+            {
+                players[j] = masterList.Players[j].Name;
+            }
+            search.ItemsSource = players;
+        }
 
         private void Back(object sender, RoutedEventArgs e)
         {
