@@ -15,6 +15,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Configuration;
 using System.Diagnostics;
+using System.IO;
+using CsvHelper;
+using System.Globalization;
+using Microsoft.Win32;
 
 namespace Optimum_FF
 {
@@ -24,12 +28,13 @@ namespace Optimum_FF
     public partial class OptimizePage : Page
     {
         PlayerMasterList masterList = new PlayerMasterList();
-        Lineup lineup = new Lineup();
+        Lineup lineup;
         //Add kickers to scrape
-        public OptimizePage()
+        public OptimizePage(Settings settings)
         {
             InitializeComponent();
 
+            lineup = new Lineup(settings);
             this.playerList.ItemsSource = lineup.Players;
 
 
@@ -61,6 +66,13 @@ namespace Optimum_FF
                 while (j < lineup.Settings.TECount)
                 {
                     lineup.Players[i + j].Position = "TE";
+                    j++;
+                }
+                i += j;
+                j = 0;
+                while (j < lineup.Settings.FlexCount)
+                {
+                    lineup.Players[i + j].Position = "Flex";
                     j++;
                 }
                 i += j;
@@ -102,6 +114,22 @@ namespace Optimum_FF
             }
             search.ItemsSource = players;
         }
+        public OptimizePage(Lineup Lineup)
+        {
+            InitializeComponent();
+
+            lineup = Lineup;
+            this.playerList.ItemsSource = lineup.Players;
+
+            playerList.Items.Refresh();
+
+            var players = new string[masterList.Players.Count()];
+            for (int j = 0; j < players.Count(); j++)
+            {
+                players[j] = masterList.Players[j].Name;
+            }
+            search.ItemsSource = players;
+        }
 
         private void Back(object sender, RoutedEventArgs e)
         {
@@ -133,9 +161,16 @@ namespace Optimum_FF
                         {
                             if (lineup.Players[i].Name == "" && (lineup.Players[i].Position == player.Position || lineup.Players[i].Position == "Bench"))
                             {
-                                var names = player.Name.Split(' ');
-                                lineup.Players[i].Name = names[1] + " " + names[0];
-                                lineup.Players[i].Team = player.Team;
+                                if (player.Name.Length > 3)
+                                {
+                                    var names = player.Name.Split(' ');
+                                    lineup.Players[i].Name = names[1] + " " + names[0];
+                                    lineup.Players[i].Team = player.Team;
+                                }
+                                else
+                                {
+                                    lineup.Players[i].Name = player.Name;
+                                }
                                 if (lineup.Players[i].Position == "Bench")
                                 {
                                     lineup.Players[i].Position = "Bench: " + player.Position;
@@ -747,6 +782,33 @@ namespace Optimum_FF
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             mainWindow?.ChangeView(new SettingsPage());
+        }
+
+        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "CSV Spreadsheet|*.csv";
+            dialog.Title = "Save Settings";
+            dialog.ShowDialog();
+
+            if (dialog.FileName != "")
+            {
+                FileStream fs = (FileStream)dialog.OpenFile();
+
+                string columns = "QBCount,WRCount,RBCount,TECount,FlexCount,KCount,DEFCount,DPCount,BenchCount,TotalCount,LeagueType\n";
+                fs.Write(Encoding.ASCII.GetBytes(columns), 0, ASCIIEncoding.ASCII.GetByteCount(columns));
+                string input = lineup.Settings.QBCount + "," + lineup.Settings.WRCount + "," + lineup.Settings.RBCount + "," +
+                    lineup.Settings.TECount + "," + lineup.Settings.FlexCount + "," + lineup.Settings.KCount + "," + 
+                    lineup.Settings.DEFCount + "," + lineup.Settings.DPCount + "," + lineup.Settings.BenchCount + "," + 
+                    lineup.Settings.TotalCount + "," + lineup.Settings.LeagueType + "\n";
+                fs.Write(Encoding.ASCII.GetBytes(input), 0, ASCIIEncoding.ASCII.GetByteCount(input));
+                foreach (var player in lineup.Players)
+                {
+                    input = player.Name + "," + player.Position + "," + player.Team.Name + "\n";
+                    fs.Write(Encoding.ASCII.GetBytes(input), 0, ASCIIEncoding.ASCII.GetByteCount(input));
+                }
+                fs.Close();
+            }
         }
     }
 }

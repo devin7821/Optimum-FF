@@ -33,7 +33,7 @@
             </ListBox>
             <Button x:Name="OptimizeButton" HorizontalAlignment="Center" Margin="0 10 0 0" Height="50" Width="100" Click="OptimizeButton_Click">Optimize</Button>
             <Button x:Name="SettingsButton" HorizontalAlignment="Center" Margin="0 5 0 0" Height="50" Width="100" Click="SettingsButton_Click">Settings</Button>
-            <Button HorizontalAlignment="Center" Margin="0 5 0 0" Height="50" Width="100">Export</Button>
+            <Button x:Name="ExportButton" HorizontalAlignment="Center" Margin="0 5 0 0" Height="50" Width="100" Click="ExportButton_Click">Export</Button>
         </StackPanel>
     </ScrollViewer>
 </Page>

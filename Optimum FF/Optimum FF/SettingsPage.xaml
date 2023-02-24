@@ -10,7 +10,98 @@
 
     <ScrollViewer>
         <StackPanel>
-            <Label HorizontalAlignment="Center" FontWeight="Bold" FontSize="35">Settings</Label>
+            <Label HorizontalAlignment="Center" FontWeight="Bold" FontSize="20">Settings</Label>
+            <Label HorizontalAlignment="Center" Margin="0 10 300 0">League Type:</Label>
+            <ComboBox x:Name="LeagueTypeSelection" HorizontalAlignment="Center" Width="200" Margin="0 -23 0 10">
+                <ComboBoxItem Content="Standard"></ComboBoxItem>
+                <ComboBoxItem Content="PPR"></ComboBoxItem>
+            </ComboBox>
+            <Label HorizontalAlignment="center" Margin="0 10 300 0">QB Starters:</Label>
+            <ComboBox x:Name="QBCountSelection" HorizontalAlignment="Center" Width="200" Margin="0 -23 0 10">
+                <ComboBoxItem Content="1"></ComboBoxItem>
+                <ComboBoxItem Content="2"></ComboBoxItem>
+                <ComboBoxItem Content="3"></ComboBoxItem>
+                <ComboBoxItem Content="4"></ComboBoxItem>
+            </ComboBox>
+            <Label HorizontalAlignment="center" Margin="0 10 300 0">WR Starters:</Label>
+            <ComboBox x:Name="WRCountSelection" HorizontalAlignment="Center" Width="200" Margin="0 -23 0 10">
+                <ComboBoxItem Content="1"></ComboBoxItem>
+                <ComboBoxItem Content="2"></ComboBoxItem>
+                <ComboBoxItem Content="3"></ComboBoxItem>
+                <ComboBoxItem Content="4"></ComboBoxItem>
+                <ComboBoxItem Content="5"></ComboBoxItem>
+                <ComboBoxItem Content="6"></ComboBoxItem>
+            </ComboBox>
+            <Label HorizontalAlignment="center" Margin="0 10 300 0">RB Starters:</Label>
+            <ComboBox x:Name="RBCountSelection" HorizontalAlignment="Center" Width="200" Margin="0 -23 0 10">
+                <ComboBoxItem Content="1"></ComboBoxItem>
+                <ComboBoxItem Content="2"></ComboBoxItem>
+                <ComboBoxItem Content="3"></ComboBoxItem>
+                <ComboBoxItem Content="4"></ComboBoxItem>
+                <ComboBoxItem Content="5"></ComboBoxItem>
+                <ComboBoxItem Content="6"></ComboBoxItem>
+            </ComboBox>
+            <Label HorizontalAlignment="center" Margin="0 10 300 0">TE Starters:</Label>
+            <ComboBox x:Name="TECountSelection" HorizontalAlignment="Center" Width="200" Margin="0 -23 0 10">
+                <ComboBoxItem Content="1"></ComboBoxItem>
+                <ComboBoxItem Content="2"></ComboBoxItem>
+                <ComboBoxItem Content="3"></ComboBoxItem>
+                <ComboBoxItem Content="4"></ComboBoxItem>
+                <ComboBoxItem Content="5"></ComboBoxItem>
+            </ComboBox>
+            <Label HorizontalAlignment="center" Margin="0 10 300 0">Flex Starters:</Label>
+            <ComboBox x:Name="FlexCountSelection" HorizontalAlignment="Center" Width="200" Margin="0 -23 0 10">
+                <ComboBoxItem Content="0"></ComboBoxItem>
+                <ComboBoxItem Content="1"></ComboBoxItem>
+                <ComboBoxItem Content="2"></ComboBoxItem>
+                <ComboBoxItem Content="3"></ComboBoxItem>
+                <ComboBoxItem Content="4"></ComboBoxItem>
+                <ComboBoxItem Content="5"></ComboBoxItem>
+            </ComboBox>
+            <Label HorizontalAlignment="center" Margin="0 10 300 0">K Starters:</Label>
+            <ComboBox x:Name="KCountSelection" HorizontalAlignment="Center" Width="200" Margin="0 -23 0 10">
+                <ComboBoxItem Content="1"></ComboBoxItem>
+                <ComboBoxItem Content="2"></ComboBoxItem>
+                <ComboBoxItem Content="3"></ComboBoxItem>
+                <ComboBoxItem Content="4"></ComboBoxItem>
+                <ComboBoxItem Content="5"></ComboBoxItem>
+            </ComboBox>
+            <Label HorizontalAlignment="center" Margin="0 10 300 0">DEF Starters:</Label>
+            <ComboBox x:Name="DEFCountSelection" HorizontalAlignment="Center" Width="200" Margin="0 -23 0 10">
+                <ComboBoxItem Content="1"></ComboBoxItem>
+                <ComboBoxItem Content="2"></ComboBoxItem>
+                <ComboBoxItem Content="3"></ComboBoxItem>
+                <ComboBoxItem Content="4"></ComboBoxItem>
+            </ComboBox>
+            <Label HorizontalAlignment="center" Margin="0 10 300 0">DP Starters:</Label>
+            <ComboBox x:Name="DPCountSelection" HorizontalAlignment="Center" Width="200" Margin="0 -23 0 10">
+                <ComboBoxItem Content="0"></ComboBoxItem>
+                <ComboBoxItem Content="1"></ComboBoxItem>
+                <ComboBoxItem Content="2"></ComboBoxItem>
+                <ComboBoxItem Content="3"></ComboBoxItem>
+                <ComboBoxItem Content="4"></ComboBoxItem>
+                <ComboBoxItem Content="5"></ComboBoxItem>
+                <ComboBoxItem Content="6"></ComboBoxItem>
+                <ComboBoxItem Content="7"></ComboBoxItem>
+                <ComboBoxItem Content="8"></ComboBoxItem>
+                <ComboBoxItem Content="9"></ComboBoxItem>
+                <ComboBoxItem Content="10"></ComboBoxItem>
+            </ComboBox>
+            <Label HorizontalAlignment="center" Margin="0 10 300 0">Bench:</Label>
+            <ComboBox x:Name="BenchCountSelection" HorizontalAlignment="Center" Width="200" Margin="0 -23 0 10">
+                <ComboBoxItem Content="1"></ComboBoxItem>
+                <ComboBoxItem Content="2"></ComboBoxItem>
+                <ComboBoxItem Content="3"></ComboBoxItem>
+                <ComboBoxItem Content="4"></ComboBoxItem>
+                <ComboBoxItem Content="5"></ComboBoxItem>
+                <ComboBoxItem Content="6"></ComboBoxItem>
+                <ComboBoxItem Content="7"></ComboBoxItem>
+                <ComboBoxItem Content="8"></ComboBoxItem>
+                <ComboBoxItem Content="9"></ComboBoxItem>
+                <ComboBoxItem Content="10"></ComboBoxItem>
+            </ComboBox>
+            <Button x:Name="DoneButton" HorizontalAlignment="Center" Width="75" Click="DoneButton_Click">Done</Button>
+            <Button x:Name="ImportButton" HorizontalAlignment="Center" Width="75" Click="ImportButton_Click">Done</Button>
         </StackPanel>
     </ScrollViewer>
 </Page>

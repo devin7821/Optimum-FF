@@ -29,7 +29,8 @@ namespace Optimum_FF
         private void OptimizeButton_Click(object sender, RoutedEventArgs e)
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
-            mainWindow?.ChangeView(new OptimizePage());
+            Settings settings = new Settings();
+            mainWindow?.ChangeView(new OptimizePage(settings));
         }
     }
 }

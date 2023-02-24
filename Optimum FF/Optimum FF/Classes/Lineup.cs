@@ -12,20 +12,9 @@ namespace Optimum_FF
         public Settings Settings { get; set; }
         public List<Player> Players { get; set; }
 
-        public Lineup()
+        public Lineup(Settings settings)
         {
-            Settings = new Settings();
-            Settings.LeagueType = "Standard";
-            Settings.QBCount = 1;
-            Settings.WRCount = 3;
-            Settings.RBCount = 2;
-            Settings.TECount = 1;
-            Settings.FlexCount = 0;
-            Settings.KCount = 1;
-            Settings.DEFCount = 1;
-            Settings.DPCount = 1;
-            Settings.BenchCount = 6;
-            Settings.TotalCount = 15;
+            Settings = settings;
             Players = new List<Player>();
             for (int i = 0; i <= Settings.TotalCount; i++)
             {
