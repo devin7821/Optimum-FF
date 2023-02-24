@@ -295,8 +295,12 @@ def AddQBs(cursor, cnxn):
     stats.columns = stats.columns.str.replace(r"[/]", "b", regex=True)
     stats.columns = stats.columns.str.replace(r"[%]", "p", regex=True)
 
+    qbcount = 0
     for index, row in stats.iterrows():
+        if qbcount >= 150:
+            break
         if row.Pos == "QB":
+            qbcount += 1
             row.Player = re.sub('[^a-zA-Z. \d\s]', '', row.Player)
             if check_if_exists(cursor, row.Player, "QBs"):
                 update_qb_row(cursor, row)
@@ -369,10 +373,15 @@ def AddReceiving(cursor, cnxn):
 
     cnxn.commit()
 
+    wrcount = 0
+    rbcount = 0
+    tecount = 0
     for index, row in stats.iterrows():
-        
+        if wrcount >= 150 and rbcount >= 150 and tecount >= 150:
+            break
         row.Player = re.sub('[^a-zA-Z. \d\s]', '', row.Player)
-        if row.Pos == "WR":
+        if row.Pos == "WR" and wrcount < 150:
+            wrcount += 1
             if check_if_exists(cursor, row.Player, "WRs"):
                 update_wr_row(cursor, row)
             else:
@@ -380,7 +389,8 @@ def AddReceiving(cursor, cnxn):
                 wr_to_insert = ([str(row.Player), str(row.Tm), int(row.G), float(row.RbG), int(row.TD), 0, int(row.Fmb), 0, float(row.YbG), 0])
                 cursor.execute(insert_into_wrs, wr_to_insert)
                 
-        if row.Pos == "RB":
+        if row.Pos == "RB" and rbcount < 150:
+            rbcount += 1
             if check_if_exists(cursor, row.Player, "RBs"):
                 update_rb_row(cursor, row)
             else:
@@ -388,7 +398,8 @@ def AddReceiving(cursor, cnxn):
                 rb_to_insert = ([str(row.Player), str(row.Tm), int(row.G), float(row.RbG), int(row.TD), 0, int(row.Fmb), 0, float(row.YbG), 0])
                 cursor.execute(insert_into_rbs, rb_to_insert)
                 
-        if row.Pos == "TE":
+        if row.Pos == "TE" and tecount < 150:
+            tecount += 1
             if check_if_exists(cursor, row.Player, "TEs"):
                 update_te_row(cursor, row)
             else:
@@ -448,9 +459,14 @@ def AddRushing(cursor, cnxn):
 
     cnxn.commit()
 
+    wrcount = 0
+    rbcount = 0
     for index, row in stats.iterrows():      
+        if wrcount >= 150 and rbcount >= 150:
+            break
         row.Player = re.sub('[^a-zA-Z. \d\s]', '', row.Player)
-        if row.Pos == "WR":
+        if row.Pos == "WR" and wrcount < 150:
+            wrcount += 1
             if check_if_exists(cursor, row.Player, "WRs"):
                 update_wr_rushing_row(cursor, row)
             else:
@@ -458,7 +474,8 @@ def AddRushing(cursor, cnxn):
                 wr_to_insert = ([str(row.Player), str(row.Tm), int(row.G), 0, 0, int(row.TD), 0, int(row.Fmb), 0, float(row.YbG)])
                 cursor.execute(insert_into_wrs, wr_to_insert)
                 
-        if row.Pos == "RB":
+        if row.Pos == "RB" and rbcount < 150:
+            rbcount += 1
             if check_if_exists(cursor, row.Player, "RBs"):
                 update_rb_rushing_row(cursor, row)
             else:
@@ -506,8 +523,12 @@ def AddDPs(cursor, cnxn):
     stats.columns = stats.columns.str.replace(r"[/]", "b", regex=True)
     stats.columns = stats.columns.str.replace(r"[%]", "p", regex=True)
 
+    dpcount = 0
     for index, row in stats.iterrows():
+        if dpcount >= 150:
+            break
         if row.Pos not in ["QB","WR","RB","TE","K"]:
+            dpcount += 1
             row.Player = re.sub('[^a-zA-Z. \d\s]', '', row.Player)
             if check_if_exists(cursor, row.Player, "DPs"):
                 update_dp_row(cursor, row)
@@ -557,7 +578,10 @@ def AddKs(cursor, cnxn):
     stats.columns = stats.columns.str.replace(r"[/]", "b", regex=True)
     stats.columns = stats.columns.str.replace(r"[%]", "p", regex=True)
 
+    kcount = 0
     for index, row in stats.iterrows():
+        if kcount >= 50:
+            break
         row.Player = re.sub('[^a-zA-Z. \d\s]', '', row.Player)
         if check_if_exists(cursor, row.Player, "Ks"):
             update_k_row(cursor, row)
