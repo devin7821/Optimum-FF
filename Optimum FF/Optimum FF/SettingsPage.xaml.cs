@@ -80,17 +80,18 @@ namespace Optimum_FF
                             bool isDigit = int.TryParse(columns[0], out num);
                             if (isDigit)
                             {
-                                lineup.Settings.QBCount = int.Parse(columns[0]);
-                                lineup.Settings.WRCount = int.Parse(columns[1]);
-                                lineup.Settings.RBCount = int.Parse(columns[2]);
-                                lineup.Settings.TECount = int.Parse(columns[3]);
-                                lineup.Settings.FlexCount = int.Parse(columns[4]);
-                                lineup.Settings.KCount = int.Parse(columns[5]);
-                                lineup.Settings.DEFCount = int.Parse(columns[6]);
-                                lineup.Settings.DPCount = int.Parse(columns[7]);
-                                lineup.Settings.BenchCount = int.Parse(columns[8]);
-                                lineup.Settings.TotalCount = int.Parse(columns[9]);
-                                lineup.Settings.LeagueType = columns[10];
+                                settings.QBCount = int.Parse(columns[0]);
+                                settings.WRCount = int.Parse(columns[1]);
+                                settings.RBCount = int.Parse(columns[2]);
+                                settings.TECount = int.Parse(columns[3]);
+                                settings.FlexCount = int.Parse(columns[4]);
+                                settings.KCount = int.Parse(columns[5]);
+                                settings.DEFCount = int.Parse(columns[6]);
+                                settings.DPCount = int.Parse(columns[7]);
+                                settings.BenchCount = int.Parse(columns[8]);
+                                settings.TotalCount = int.Parse(columns[9]);
+                                settings.LeagueType = columns[10];
+                                lineup = new Lineup(settings);
                             }
                             else
                             {
