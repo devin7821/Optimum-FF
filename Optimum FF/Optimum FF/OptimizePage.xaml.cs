@@ -29,13 +29,34 @@ namespace Optimum_FF
     {
         PlayerMasterList masterList = new PlayerMasterList();
         Lineup lineup;
-        //Add kickers to scrape
+        Player[] trades = new Player[4];
+        List<Player> qbsList = new List<Player>();
+        List<Player> wrsList = new List<Player>();
+        List<Player> rbsList = new List<Player>();
+        List<Player> tesList = new List<Player>();
+        List<Player> ksList = new List<Player>();
+        List<Player> defbsList = new List<Player>();
+        List<Player> dpsList = new List<Player>();
+        double? qbValue;
+        double? wrValue;
+        double? rbValue;
+        double? teValue;
+        double? kValue;
+        double? defValue;
+        double? dpValue;
+
         public OptimizePage(Settings settings)
         {
             InitializeComponent();
 
             lineup = new Lineup(settings);
             this.playerList.ItemsSource = lineup.Players;
+            for (int k = 0; k < 4; k++)
+            {
+                trades[k] = new Player();
+                trades[k].Name = "TradeSlot";
+            }
+            this.tradeList.ItemsSource = trades;
 
 
             int i = 0;
@@ -120,8 +141,15 @@ namespace Optimum_FF
 
             lineup = Lineup;
             this.playerList.ItemsSource = lineup.Players;
+            for (int k = 0; k < 4; k++)
+            {
+                trades[k] = new Player();
+                trades[k].Name = "TradeSlot";
+            }
+            this.tradeList.ItemsSource = trades;
 
             playerList.Items.Refresh();
+            tradeList.Items.Refresh();
 
             var players = new string[masterList.Players.Count()];
             for (int j = 0; j < players.Count(); j++)
@@ -205,6 +233,7 @@ namespace Optimum_FF
             RankDEFs();
             RankDPs();
             RankKs();
+            GetTrades();
             foreach (var player in masterList.Players) if (player.Name.Length > 3)
                 {
                     var names = player.Name.Split(' ');
@@ -268,6 +297,8 @@ namespace Optimum_FF
                 {
                     player.Value = qbs.Find(x => x.Name.Contains(player.Name)).Value;
                     player.Rank = qbs.Find(x => x.Name.Contains(player.Name)).Rank;
+                    qbValue += player.Value;
+                    qbsList.Add(player);
                 }
             for (int i = 0; i < lineup.Settings.QBCount; i++)
             {
@@ -352,6 +383,8 @@ namespace Optimum_FF
                 {
                     player.Value = wrs.Find(x => x.Name.Contains(player.Name)).Value;
                     player.Rank = wrs.Find(x => x.Name.Contains(player.Name)).Rank;
+                    wrValue += player.Value;
+                    wrsList.Add(player);
                 }
             for (int i = 0; i < lineup.Settings.WRCount; i++)
             {
@@ -437,6 +470,8 @@ namespace Optimum_FF
                 {
                     player.Value = rbs.Find(x => x.Name.Contains(player.Name)).Value;
                     player.Rank = rbs.Find(x => x.Name.Contains(player.Name)).Rank;
+                    rbValue += player.Value;
+                    rbsList.Add(player);
                 }
             for (int i = 0; i < lineup.Settings.RBCount; i++)
             {
@@ -516,6 +551,8 @@ namespace Optimum_FF
                 {
                     player.Value = tes.Find(x => x.Name.Contains(player.Name)).Value;
                     player.Rank = tes.Find(x => x.Name.Contains(player.Name)).Rank;
+                    teValue += player.Value;
+                    tesList.Add(player);
                 }
             for (int i = 0; i < lineup.Settings.TECount; i++)
             {
@@ -600,6 +637,8 @@ namespace Optimum_FF
                 {
                     player.Value = ks.Find(x => x.Name.Contains(player.Name)).Value;
                     player.Rank = ks.Find(x => x.Name.Contains(player.Name)).Rank;
+                    kValue += player.Value;
+                    ksList.Add(player);
                 }
             for (int i = 0; i < lineup.Settings.KCount; i++)
             {
@@ -683,6 +722,8 @@ namespace Optimum_FF
                 {
                     player.Value = defs.Find(x => x.Name.Contains(player.Name)).Value;
                     player.Rank = defs.Find(x => x.Name.Contains(player.Name)).Rank;
+                    defValue += player.Value;
+                    defsList.Add(player);
                 }
             for (int i = 0; i < lineup.Settings.DEFCount; i++)
             {
@@ -758,6 +799,8 @@ namespace Optimum_FF
                 {
                     player.Value = dps.Find(x => x.Name.Contains(player.Name)).Value;
                     player.Rank = dps.Find(x => x.Name.Contains(player.Name)).Rank;
+                    dpValue += player.Value;
+                    dpsList.Add(player);
                 }
             for (int i = 0; i < lineup.Settings.TECount; i++)
             {
@@ -776,6 +819,23 @@ namespace Optimum_FF
             }
             playerList.ItemsSource = lineup.Players;
             playerList.Items.Refresh();
+        }
+
+        private void GetTrades()
+        {
+            double?[] arr = new double?[] { qbValue, wrValue, rbValue, teValue, kValue, defValue, dpValue };
+            if (arr.Max() == qbValue)
+            {
+                Player receive;
+                Player send = qbsList.Min();
+                if (arr.Min() == wrValue)
+                {
+                    foreach (Player wr in masterList.Players.FindAll(x => x.Position == "WR"))
+                    {
+                        int diff = wr.Value - send.Value;
+                    }
+                }
+            }
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
