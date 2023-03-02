@@ -40,10 +40,7 @@ namespace Optimum_FF
         double? qbValue = 0;
         double? wrValue = 0;
         double? rbValue = 0;
-        double? teValue;
-        double? kValue;
-        double? defValue;
-        double? dpValue;
+        double? teValue = 0;
 
         public OptimizePage(Settings settings)
         {
@@ -637,8 +634,6 @@ namespace Optimum_FF
                 {
                     player.Value = ks.Find(x => x.Name.Contains(player.Name)).Value;
                     player.Rank = ks.Find(x => x.Name.Contains(player.Name)).Rank;
-                    kValue += player.Value;
-                    ksList.Add(player);
                 }
             for (int i = 0; i < lineup.Settings.KCount; i++)
             {
@@ -722,8 +717,6 @@ namespace Optimum_FF
                 {
                     player.Value = defs.Find(x => x.Name.Contains(player.Name)).Value;
                     player.Rank = defs.Find(x => x.Name.Contains(player.Name)).Rank;
-                    defValue += player.Value;
-                    defsList.Add(player);
                 }
             for (int i = 0; i < lineup.Settings.DEFCount; i++)
             {
@@ -799,8 +792,6 @@ namespace Optimum_FF
                 {
                     player.Value = dps.Find(x => x.Name.Contains(player.Name)).Value;
                     player.Rank = dps.Find(x => x.Name.Contains(player.Name)).Rank;
-                    dpValue += player.Value;
-                    dpsList.Add(player);
                 }
             for (int i = 0; i < lineup.Settings.TECount; i++)
             {
@@ -823,11 +814,12 @@ namespace Optimum_FF
 
         private void GetTrades()
         {
-            double?[] arr = new double?[] { qbValue, wrValue, rbValue };
+            double?[] arr = new double?[] { qbValue, wrValue, rbValue, teValue };
             Array.Sort(arr);
             qbsList = qbsList.OrderBy(x => x.Value).ToList();
             wrsList = wrsList.OrderBy(x => x.Value).ToList();
             rbsList = rbsList.OrderBy(x => x.Value).ToList();
+            tesList = tesList.OrderBy(x => x.Value).ToList();
             if (arr[arr.Length - 1] == qbValue || arr[arr.Length - 2] == qbValue)
             {
                 Player receive = new Player();
@@ -842,38 +834,65 @@ namespace Optimum_FF
                     trade = "second";
                 }
 
-                if (arr[0] == wrValue)
+                if ((arr[0] == wrValue && trade == "first") || (arr[1] == wrValue && trade == "second"))
                 {
                     foreach (Player wr in masterList.Players.FindAll(x => x.Position == "WR"))
                     {
-                        double? diff = send.Value - wr.Value;
-                        if (receive.Value == 0)
+                        if (wrsList.Find(x => x.Name == wr.Name) == null)
                         {
-                            receive = wr;
-                        }
-                        else if ((send.Value - receive.Value) > diff)
-                        {
-                            if (diff > 0)
+                            double? diff = send.Value - wr.Value;
+                            if (receive.Value == 0)
                             {
                                 receive = wr;
+                            }
+                            else if ((send.Value - receive.Value) > diff)
+                            {
+                                if (diff > 0)
+                                {
+                                    receive = wr;
+                                }
                             }
                         }
                     }      
                 }
-                if (arr[0] == rbValue)
+                if ((arr[0] == rbValue && trade == "first") || (arr[1] == rbValue && trade == "second"))
                 {
                     foreach (Player rb in masterList.Players.FindAll(x => x.Position == "RB"))
                     {
-                        double? diff = send.Value - rb.Value;
-                        if (receive.Value == 0)
+                        if (rbsList.Find(x => x.Name == rb.Name) == null)
                         {
-                            receive = rb;
-                        }
-                        else if ((send.Value - receive.Value) > diff)
-                        {
-                            if (diff > 0)
+                            double? diff = send.Value - rb.Value;
+                            if (receive.Value == 0)
                             {
                                 receive = rb;
+                            }
+                            else if ((send.Value - receive.Value) > diff)
+                            {
+                                if (diff > 0)
+                                {
+                                    receive = rb;
+                                }
+                            }
+                        }
+                    }
+                }
+                if ((arr[0] == teValue && trade == "first") || (arr[1] == teValue && trade == "second"))
+                {
+                    foreach (Player te in masterList.Players.FindAll(x => x.Position == "TE"))
+                    {
+                        if (tesList.Find(x => x.Name == te.Name) == null)
+                        {
+                            double? diff = send.Value - te.Value;
+                            if (receive.Value == 0)
+                            {
+                                receive = te;
+                            }
+                            else if ((send.Value - receive.Value) > diff)
+                            {
+                                if (diff > 0)
+                                {
+                                    receive = te;
+                                }
                             }
                         }
                     }
@@ -905,38 +924,65 @@ namespace Optimum_FF
                     trade = "second";
                 }
 
-                if (arr[0] == qbValue)
+                if ((arr[0] == qbValue && trade == "first") || (arr[1] == qbValue && trade == "second"))
                 {
                     foreach (Player qb in masterList.Players.FindAll(x => x.Position == "QB"))
                     {
-                        double? diff = send.Value - qb.Value;
-                        if (receive.Value == 0)
+                        if (qbsList.Find(x => x.Name == qb.Name) == null)
                         {
-                            receive = qb;
-                        }
-                        else if ((send.Value - receive.Value) > diff)
-                        {
-                            if (diff > 0)
+                            double? diff = send.Value - qb.Value;
+                            if (receive.Value == 0)
                             {
                                 receive = qb;
+                            }
+                            else if ((send.Value - receive.Value) > diff)
+                            {
+                                if (diff > 0)
+                                {
+                                    receive = qb;
+                                }
                             }
                         }
                     }
                 }
-                if (arr[0] == rbValue)
+                if ((arr[0] == rbValue && trade == "first") || (arr[1] == rbValue && trade == "second"))
                 {
                     foreach (Player rb in masterList.Players.FindAll(x => x.Position == "RB"))
                     {
-                        double? diff = send.Value - rb.Value;
-                        if (receive.Value == 0)
+                        if (rbsList.Find(x => x.Name == rb.Name) == null)
                         {
-                            receive = rb;
-                        }
-                        else if ((send.Value - receive.Value) > diff)
-                        {
-                            if (diff > 0)
+                            double? diff = send.Value - rb.Value;
+                            if (receive.Value == 0)
                             {
                                 receive = rb;
+                            }
+                            else if ((send.Value - receive.Value) > diff)
+                            {
+                                if (diff > 0)
+                                {
+                                    receive = rb;
+                                }
+                            }
+                        }
+                    }
+                }
+                if ((arr[0] == teValue && trade == "first") || (arr[1] == teValue && trade == "second"))
+                {
+                    foreach (Player te in masterList.Players.FindAll(x => x.Position == "TE"))
+                    {
+                        if (tesList.Find(x => x.Name == te.Name) == null)
+                        {
+                            double? diff = send.Value - te.Value;
+                            if (receive.Value == 0)
+                            {
+                                receive = te;
+                            }
+                            else if ((send.Value - receive.Value) > diff)
+                            {
+                                if (diff > 0)
+                                {
+                                    receive = te;
+                                }
                             }
                         }
                     }
@@ -968,38 +1014,155 @@ namespace Optimum_FF
                     trade = "second";
                 }
 
-                if (arr[0] == wrValue)
+                if ((arr[0] == wrValue && trade == "first") || (arr[1] == wrValue && trade == "second"))
                 {
                     foreach (Player wr in masterList.Players.FindAll(x => x.Position == "WR"))
                     {
-                        double? diff = send.Value - wr.Value;
-                        if (receive.Value == 0)
+                        if (wrsList.Find(x => x.Name == wr.Name) == null)
                         {
-                            receive = wr;
-                        }
-                        else if ((send.Value - receive.Value) > diff)
-                        {
-                            if (diff > 0)
+                            double? diff = send.Value - wr.Value;
+                            if (receive.Value == 0)
                             {
                                 receive = wr;
+                            }
+                            else if ((send.Value - receive.Value) > diff)
+                            {
+                                if (diff > 0)
+                                {
+                                    receive = wr;
+                                }
                             }
                         }
                     }
                 }
-                if (arr[0] == qbValue)
+                if ((arr[0] == qbValue && trade == "first") || (arr[1] == qbValue && trade == "second"))
                 {
                     foreach (Player qb in masterList.Players.FindAll(x => x.Position == "QB"))
                     {
-                        double? diff = send.Value - qb.Value;
-                        if (receive.Value == 0)
+                        if (qbsList.Find(x => x.Name == qb.Name) == null)
                         {
-                            receive = qb;
-                        }
-                        else if ((send.Value - receive.Value) > diff)
-                        {
-                            if (diff > 0)
+                            double? diff = send.Value - qb.Value;
+                            if (receive.Value == 0)
                             {
                                 receive = qb;
+                            }
+                            else if ((send.Value - receive.Value) > diff)
+                            {
+                                if (diff > 0)
+                                {
+                                    receive = qb;
+                                }
+                            }
+                        }
+                    }
+                }
+                if ((arr[0] == teValue && trade == "first") || (arr[1] == teValue && trade == "second"))
+                {
+                    foreach (Player te in masterList.Players.FindAll(x => x.Position == "TE"))
+                    {
+                        if (tesList.Find(x => x.Name == te.Name) == null)
+                        {
+                            double? diff = send.Value - te.Value;
+                            if (receive.Value == 0)
+                            {
+                                receive = te;
+                            }
+                            else if ((send.Value - receive.Value) > diff)
+                            {
+                                if (diff > 0)
+                                {
+                                    receive = te;
+                                }
+                            }
+                        }
+                    }
+                }
+                send.Position = "Send: " + send.Position;
+                receive.Position = "Receive: " + receive.Position;
+                if (trade == "first")
+                {
+                    trades[0] = send;
+                    trades[1] = receive;
+                }
+                else
+                {
+                    trades[2] = send;
+                    trades[3] = receive;
+                }
+            }
+            if (arr[arr.Length - 1] == teValue || arr[arr.Length - 2] == teValue)
+            {
+                Player receive = new Player();
+                Player send = tesList[0];
+                string trade;
+                if (arr[arr.Length - 1] == teValue)
+                {
+                    trade = "first";
+                }
+                else
+                {
+                    trade = "second";
+                }
+
+                if ((arr[0] == wrValue && trade == "first") || (arr[1] == wrValue && trade == "second"))
+                {
+                    foreach (Player wr in masterList.Players.FindAll(x => x.Position == "WR"))
+                    {
+                        if (wrsList.Find(x => x.Name == wr.Name) == null)
+                        {
+                            double? diff = send.Value - wr.Value;
+                            if (receive.Value == 0)
+                            {
+                                receive = wr;
+                            }
+                            else if ((send.Value - receive.Value) > diff)
+                            {
+                                if (diff > 0)
+                                {
+                                    receive = wr;
+                                }
+                            }
+                        }
+                    }
+                }
+                if ((arr[0] == qbValue && trade == "first") || (arr[1] == qbValue && trade == "second"))
+                {
+                    foreach (Player qb in masterList.Players.FindAll(x => x.Position == "QB"))
+                    {
+                        if (qbsList.Find(x => x.Name == qb.Name) == null)
+                        {
+                            double? diff = send.Value - qb.Value;
+                            if (receive.Value == 0)
+                            {
+                                receive = qb;
+                            }
+                            else if ((send.Value - receive.Value) > diff)
+                            {
+                                if (diff > 0)
+                                {
+                                    receive = qb;
+                                }
+                            }
+                        }
+                    }
+                }
+                if ((arr[0] == rbValue && trade == "first") || (arr[1] == rbValue && trade == "second"))
+                {
+                    foreach (Player rb in masterList.Players.FindAll(x => x.Position == "RB"))
+                    {
+                        if (rbsList.Find(x => x.Name == rb.Name) == null)
+                        {
+                            double? diff = send.Value - rb.Value;
+                            if (receive.Value == 0)
+                            {
+                                receive = rb;
+                            }
+                            else if ((send.Value - receive.Value) > diff)
+                            {
+                                if (diff > 0)
+                                {
+                                    receive = rb;
+                                }
                             }
                         }
                     }
