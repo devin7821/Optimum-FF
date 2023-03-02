@@ -35,11 +35,11 @@ namespace Optimum_FF
         List<Player> rbsList = new List<Player>();
         List<Player> tesList = new List<Player>();
         List<Player> ksList = new List<Player>();
-        List<Player> defbsList = new List<Player>();
+        List<Player> defsList = new List<Player>();
         List<Player> dpsList = new List<Player>();
-        double? qbValue;
-        double? wrValue;
-        double? rbValue;
+        double? qbValue = 0;
+        double? wrValue = 0;
+        double? rbValue = 0;
         double? teValue;
         double? kValue;
         double? defValue;
@@ -56,7 +56,7 @@ namespace Optimum_FF
                 trades[k] = new Player();
                 trades[k].Name = "TradeSlot";
             }
-            this.tradeList.ItemsSource = trades;
+            this.tradesList.ItemsSource = trades;
 
 
             int i = 0;
@@ -146,10 +146,10 @@ namespace Optimum_FF
                 trades[k] = new Player();
                 trades[k].Name = "TradeSlot";
             }
-            this.tradeList.ItemsSource = trades;
+            this.tradesList.ItemsSource = trades;
 
             playerList.Items.Refresh();
-            tradeList.Items.Refresh();
+            tradesList.Items.Refresh();
 
             var players = new string[masterList.Players.Count()];
             for (int j = 0; j < players.Count(); j++)
@@ -823,19 +823,201 @@ namespace Optimum_FF
 
         private void GetTrades()
         {
-            double?[] arr = new double?[] { qbValue, wrValue, rbValue, teValue, kValue, defValue, dpValue };
-            if (arr.Max() == qbValue)
+            double?[] arr = new double?[] { qbValue, wrValue, rbValue };
+            Array.Sort(arr);
+            qbsList = qbsList.OrderBy(x => x.Value).ToList();
+            wrsList = wrsList.OrderBy(x => x.Value).ToList();
+            rbsList = rbsList.OrderBy(x => x.Value).ToList();
+            if (arr[arr.Length - 1] == qbValue || arr[arr.Length - 2] == qbValue)
             {
-                Player receive;
-                Player send = qbsList.Min();
-                if (arr.Min() == wrValue)
+                Player receive = new Player();
+                Player send = qbsList[0];
+                string trade;
+                if (arr[arr.Length - 1] == qbValue)
+                {
+                    trade = "first";
+                }
+                else
+                {
+                    trade = "second";
+                }
+
+                if (arr[0] == wrValue)
                 {
                     foreach (Player wr in masterList.Players.FindAll(x => x.Position == "WR"))
                     {
-                        int diff = wr.Value - send.Value;
+                        double? diff = send.Value - wr.Value;
+                        if (receive.Value == 0)
+                        {
+                            receive = wr;
+                        }
+                        else if ((send.Value - receive.Value) > diff)
+                        {
+                            if (diff > 0)
+                            {
+                                receive = wr;
+                            }
+                        }
+                    }      
+                }
+                if (arr[0] == rbValue)
+                {
+                    foreach (Player rb in masterList.Players.FindAll(x => x.Position == "RB"))
+                    {
+                        double? diff = send.Value - rb.Value;
+                        if (receive.Value == 0)
+                        {
+                            receive = rb;
+                        }
+                        else if ((send.Value - receive.Value) > diff)
+                        {
+                            if (diff > 0)
+                            {
+                                receive = rb;
+                            }
+                        }
                     }
                 }
+                send.Position = "Send: " + send.Position;
+                receive.Position = "Receive: " + receive.Position;
+                if (trade == "first")
+                {
+                    trades[0] = send;
+                    trades[1] = receive;
+                }
+                else
+                {
+                    trades[2] = send;
+                    trades[3] = receive;
+                }
             }
+            if (arr[arr.Length - 1] == wrValue || arr[arr.Length - 2] == wrValue)
+            {
+                Player receive = new Player();
+                Player send = wrsList[0];
+                string trade;
+                if (arr[arr.Length - 1] == wrValue)
+                {
+                    trade = "first";
+                }
+                else
+                {
+                    trade = "second";
+                }
+
+                if (arr[0] == qbValue)
+                {
+                    foreach (Player qb in masterList.Players.FindAll(x => x.Position == "QB"))
+                    {
+                        double? diff = send.Value - qb.Value;
+                        if (receive.Value == 0)
+                        {
+                            receive = qb;
+                        }
+                        else if ((send.Value - receive.Value) > diff)
+                        {
+                            if (diff > 0)
+                            {
+                                receive = qb;
+                            }
+                        }
+                    }
+                }
+                if (arr[0] == rbValue)
+                {
+                    foreach (Player rb in masterList.Players.FindAll(x => x.Position == "RB"))
+                    {
+                        double? diff = send.Value - rb.Value;
+                        if (receive.Value == 0)
+                        {
+                            receive = rb;
+                        }
+                        else if ((send.Value - receive.Value) > diff)
+                        {
+                            if (diff > 0)
+                            {
+                                receive = rb;
+                            }
+                        }
+                    }
+                }
+                send.Position = "Send: " + send.Position;
+                receive.Position = "Receive: " + receive.Position;
+                if (trade == "first")
+                {
+                    trades[0] = send;
+                    trades[1] = receive;
+                }
+                else
+                {
+                    trades[2] = send;
+                    trades[3] = receive;
+                }
+            }
+            if (arr[arr.Length - 1] == rbValue || arr[arr.Length - 2] == rbValue)
+            {
+                Player receive = new Player();
+                Player send = rbsList[0];
+                string trade;
+                if (arr[arr.Length - 1] == rbValue)
+                {
+                    trade = "first";
+                }
+                else
+                {
+                    trade = "second";
+                }
+
+                if (arr[0] == wrValue)
+                {
+                    foreach (Player wr in masterList.Players.FindAll(x => x.Position == "WR"))
+                    {
+                        double? diff = send.Value - wr.Value;
+                        if (receive.Value == 0)
+                        {
+                            receive = wr;
+                        }
+                        else if ((send.Value - receive.Value) > diff)
+                        {
+                            if (diff > 0)
+                            {
+                                receive = wr;
+                            }
+                        }
+                    }
+                }
+                if (arr[0] == qbValue)
+                {
+                    foreach (Player qb in masterList.Players.FindAll(x => x.Position == "QB"))
+                    {
+                        double? diff = send.Value - qb.Value;
+                        if (receive.Value == 0)
+                        {
+                            receive = qb;
+                        }
+                        else if ((send.Value - receive.Value) > diff)
+                        {
+                            if (diff > 0)
+                            {
+                                receive = qb;
+                            }
+                        }
+                    }
+                }
+                send.Position = "Send: " + send.Position;
+                receive.Position = "Receive: " + receive.Position;
+                if (trade == "first")
+                {
+                    trades[0] = send;
+                    trades[1] = receive;
+                }
+                else
+                {
+                    trades[2] = send;
+                    trades[3] = receive;
+                }
+            }
+            tradesList.Items.Refresh();
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)

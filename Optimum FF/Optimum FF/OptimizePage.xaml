@@ -31,7 +31,7 @@
                     </Style>
                 </ListBox.ItemContainerStyle>
             </ListBox>
-            <ListBox Name="tradeList">
+            <ListBox x:Name="tradesList">
                 <ListBox.Resources>
                     <DataTemplate x:Key="PlayerTemplate">
                         <TextBlock Text="{Binding Name}"></TextBlock>
