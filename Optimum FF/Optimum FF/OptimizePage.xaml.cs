@@ -34,9 +34,6 @@ namespace Optimum_FF
         List<Player> wrsList = new List<Player>();
         List<Player> rbsList = new List<Player>();
         List<Player> tesList = new List<Player>();
-        List<Player> ksList = new List<Player>();
-        List<Player> defsList = new List<Player>();
-        List<Player> dpsList = new List<Player>();
         double? qbValue = 0;
         double? wrValue = 0;
         double? rbValue = 0;
