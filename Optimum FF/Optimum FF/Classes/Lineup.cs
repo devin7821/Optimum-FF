@@ -11,18 +11,19 @@ namespace Optimum_FF
     {
         public Settings Settings { get; set; }
         public List<Player> Players { get; set; }
-
+        //Constructor with settings
         public Lineup(Settings settings)
         {
             Settings = settings;
             Players = new List<Player>();
+            // Initialize players
             for (int i = 0; i <= Settings.TotalCount; i++)
             {
                 Player player = new Player();
                 Players.Add(player);
             }
         }
-
+        // Swap position of 2 players
         public void Swap(Player player1, Player player2)
         {
             var index = Players.IndexOf(player2);

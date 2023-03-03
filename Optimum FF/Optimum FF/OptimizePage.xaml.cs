@@ -27,9 +27,11 @@ namespace Optimum_FF
     /// </summary>
     public partial class OptimizePage : Page
     {
+        // Lists for Display/Searching
         PlayerMasterList masterList = new PlayerMasterList();
         Lineup lineup;
         Player[] trades = new Player[4];
+        // Lists and Values for trading
         List<Player> qbsList = new List<Player>();
         List<Player> wrsList = new List<Player>();
         List<Player> rbsList = new List<Player>();
@@ -39,10 +41,11 @@ namespace Optimum_FF
         double? rbValue = 0;
         double? teValue = 0;
 
+        // Page constructor that takes settings
         public OptimizePage(Settings settings)
         {
             InitializeComponent();
-
+            // Initialize settings/trades for page
             lineup = new Lineup(settings);
             this.playerList.ItemsSource = lineup.Players;
             for (int k = 0; k < 4; k++)
@@ -52,7 +55,7 @@ namespace Optimum_FF
             }
             this.tradesList.ItemsSource = trades;
 
-
+            // Populate lineup
             int i = 0;
             while (i < lineup.Settings.TotalCount)
             {
@@ -121,7 +124,7 @@ namespace Optimum_FF
                 i += j;
             }
             playerList.Items.Refresh();
-
+            // Populate player search list
             var players = new string[masterList.Players.Count()];
             for (int j = 0; j < players.Count(); j++)
             {
@@ -129,10 +132,11 @@ namespace Optimum_FF
             }
             search.ItemsSource = players;
         }
+        // Page constructor that takes lineup
         public OptimizePage(Lineup Lineup)
         {
             InitializeComponent();
-
+            // Set lineup and populate trades
             lineup = Lineup;
             this.playerList.ItemsSource = lineup.Players;
             for (int k = 0; k < 4; k++)
@@ -144,7 +148,7 @@ namespace Optimum_FF
 
             playerList.Items.Refresh();
             tradesList.Items.Refresh();
-
+            // Populate player search list
             var players = new string[masterList.Players.Count()];
             for (int j = 0; j < players.Count(); j++)
             {
@@ -152,16 +156,17 @@ namespace Optimum_FF
             }
             search.ItemsSource = players;
         }
-
+        // Return to the main page
         private void Back(object sender, RoutedEventArgs e)
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             mainWindow?.ChangeView(new MainMenu());
         }
-
+        // Add chosen player to lineup
         private void AddPlayer_Click(object sender, RoutedEventArgs e)
         {
             bool found = false;
+            // Check if player is already in lineup
             foreach (var player in lineup.Players)
             {
                 if (player == null)
@@ -173,6 +178,7 @@ namespace Optimum_FF
                     found = true;
                 }
             }
+            // Search for player in the master list
             if (!found)
             {
                 foreach (var player in masterList.Players)
@@ -212,14 +218,16 @@ namespace Optimum_FF
                 }
             }
         }
-
+        // Optimize the user lineup
         private void OptimizeButton_Click(object sender, RoutedEventArgs e)
         {
+            // Put names into first-last form
             foreach (var player in masterList.Players) if (player.Name.Length > 3)
                 {
                     var names = player.Name.Split(' ');
                     player.Name = (names[1] + " " + names[0]);
                 }
+            // Value and rank positions
             RankQBs();
             RankWRs();
             RankRBs();
@@ -227,14 +235,16 @@ namespace Optimum_FF
             RankDEFs();
             RankDPs();
             RankKs();
+            // Find trade suggestions
             GetTrades();
+            // Return names to last-first form
             foreach (var player in masterList.Players) if (player.Name.Length > 3)
                 {
                     var names = player.Name.Split(' ');
                     player.Name = (names[1] + " " + names[0]);
                 }
         }
-
+        // Rank and value qbs
         private void RankQBs()
         {
             List<Player> qbs;
@@ -242,7 +252,7 @@ namespace Optimum_FF
 
             foreach (var player in qbs)
             {
-                //Create SQL connection
+                // Create SQL connection
                 string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
                 using (var conn = new SqlConnection(connectionString))
                 {
@@ -253,15 +263,16 @@ namespace Optimum_FF
                         cmd.Parameters.AddWithValue("@Player", player.Name);
                         SqlDataReader dr = cmd.ExecuteReader();
 
-                        //Read QB Data
+                        // Read QB Data
                         while (dr.Read())
                         {
-                            //Get Player info
+                            // Get name
                             string name = dr["Player"].ToString();
 
-                            //Check if player is null
+                            // Check if player is null
                             if (name == player.Name)
                             {
+                                // Get player stats
                                 double value = 0;
 
                                 int games = (int)dr["Games"];
@@ -282,11 +293,14 @@ namespace Optimum_FF
                     }
                 }
             }
+            // Order QBs by value
             qbs = qbs.OrderBy(x => x.Value).ToList();
+            // Rank QBs
             for (int i = qbs.Count() - 1; i >= 0; i--)
             {
                 qbs[i].Rank = qbs.Count() - i;
             }
+            // Set value and rank of players in lineup
             foreach (var player in lineup.Players) if (player.Position.EndsWith("QB"))
                 {
                     player.Value = qbs.Find(x => x.Name.Contains(player.Name)).Value;
@@ -294,6 +308,7 @@ namespace Optimum_FF
                     qbValue += player.Value;
                     qbsList.Add(player);
                 }
+            // Order QB positions in user lineup
             for (int i = 0; i < lineup.Settings.QBCount; i++)
             {
             restart:
@@ -311,7 +326,7 @@ namespace Optimum_FF
             playerList.ItemsSource = lineup.Players;
             playerList.Items.Refresh();
         }
-
+        // Rank and value WRs
         private void RankWRs()
         {
             List<Player> wrs;
@@ -319,7 +334,7 @@ namespace Optimum_FF
 
             foreach (var player in wrs)
             {
-                //Create SQL connection
+                // Create SQL connection
                 string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
                 using (var conn = new SqlConnection(connectionString))
                 {
@@ -330,15 +345,16 @@ namespace Optimum_FF
                         cmd.Parameters.AddWithValue("@Player", player.Name);
                         SqlDataReader dr = cmd.ExecuteReader();
 
-                        //Read QB Data
+                        // Read WR Data
                         while (dr.Read())
                         {
-                            //Get Player info
+                            // Get name
                             string name = dr["Player"].ToString();
 
-                            //Check if player is null
+                            // Check if player is null
                             if (name == player.Name)
                             {
+                                // Get player stats
                                 double value = 0;
 
                                 int games = (int)dr["Games"];
@@ -368,11 +384,14 @@ namespace Optimum_FF
                     }
                 }
             }
+            // Order WRs by value
             wrs = wrs.OrderBy(x => x.Value).ToList();
+            // Rank WRs
             for (int i = wrs.Count() - 1; i >= 0; i--)
             {
                 wrs[i].Rank = wrs.Count() - i;
             }
+            // Set rank and value for user lineup
             foreach (var player in lineup.Players) if (player.Position.EndsWith("WR"))
                 {
                     player.Value = wrs.Find(x => x.Name.Contains(player.Name)).Value;
@@ -380,6 +399,7 @@ namespace Optimum_FF
                     wrValue += player.Value;
                     wrsList.Add(player);
                 }
+            // Order players in user lineup
             for (int i = 0; i < lineup.Settings.WRCount; i++)
             {
                 int currentPlayer = lineup.Settings.QBCount + i;
@@ -398,7 +418,7 @@ namespace Optimum_FF
             playerList.ItemsSource = lineup.Players;
             playerList.Items.Refresh();
         }
-
+        // Rank and value RBs
         private void RankRBs()
         {
             List<Player> rbs;
@@ -406,7 +426,7 @@ namespace Optimum_FF
 
             foreach (var player in rbs)
             {
-                //Create SQL connection
+                // Create SQL connection
                 string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
                 using (var conn = new SqlConnection(connectionString))
                 {
@@ -417,15 +437,16 @@ namespace Optimum_FF
                         cmd.Parameters.AddWithValue("@Player", player.Name);
                         SqlDataReader dr = cmd.ExecuteReader();
 
-                        //Read QB Data
+                        // Read RB Data
                         while (dr.Read())
                         {
-                            //Get Player info
+                            // Get name
                             string name = dr["Player"].ToString();
 
-                            //Check if player is null
+                            // Check if player is null
                             if (name == player.Name)
                             {
+                                // Get player stats
                                 double value = 0;
 
                                 int games = (int)dr["Games"];
@@ -455,11 +476,14 @@ namespace Optimum_FF
                     }
                 }
             }
+            // Order RBs by value
             rbs = rbs.OrderBy(x => x.Value).ToList();
+            // Rank RBs
             for (int i = rbs.Count() - 1; i >= 0; i--)
             {
                 rbs[i].Rank = rbs.Count() - i;
             }
+            // Rank and value players in user lineup
             foreach (var player in lineup.Players) if (player.Position.EndsWith("RB"))
                 {
                     player.Value = rbs.Find(x => x.Name.Contains(player.Name)).Value;
@@ -467,6 +491,7 @@ namespace Optimum_FF
                     rbValue += player.Value;
                     rbsList.Add(player);
                 }
+            // Order players in user lineup
             for (int i = 0; i < lineup.Settings.RBCount; i++)
             {
                 int currentPlayer = lineup.Settings.QBCount + lineup.Settings.WRCount + i;
@@ -485,7 +510,7 @@ namespace Optimum_FF
             playerList.ItemsSource = lineup.Players;
             playerList.Items.Refresh();
         }
-
+        // Rank and value TEs
         private void RankTEs()
         {
             List<Player> tes;
@@ -493,7 +518,7 @@ namespace Optimum_FF
 
             foreach (var player in tes)
             {
-                //Create SQL connection
+                // Create SQL connection
                 string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
                 using (var conn = new SqlConnection(connectionString))
                 {
@@ -504,15 +529,16 @@ namespace Optimum_FF
                         cmd.Parameters.AddWithValue("@Player", player.Name);
                         SqlDataReader dr = cmd.ExecuteReader();
 
-                        //Read QB Data
+                        // Read TE Data
                         while (dr.Read())
                         {
-                            //Get Player info
+                            // Get name
                             string name = dr["Player"].ToString();
 
-                            //Check if player is null
+                            // Check if player is null
                             if (name == player.Name)
                             {
+                                // Get player stats
                                 double value = 0;
 
                                 int games = (int)dr["Games"];
@@ -536,11 +562,14 @@ namespace Optimum_FF
                     }
                 }
             }
+            // Order TEs by value
             tes = tes.OrderBy(x => x.Value).ToList();
+            // Rank TEs
             for (int i = tes.Count() - 1; i >= 0; i--)
             {
                 tes[i].Rank = tes.Count() - i;
             }
+            // Rank and value players in user lineup
             foreach (var player in lineup.Players) if (player.Position.EndsWith("TE"))
                 {
                     player.Value = tes.Find(x => x.Name.Contains(player.Name)).Value;
@@ -548,6 +577,7 @@ namespace Optimum_FF
                     teValue += player.Value;
                     tesList.Add(player);
                 }
+            // Order players in user lineup
             for (int i = 0; i < lineup.Settings.TECount; i++)
             {
                 int currentPlayer = lineup.Settings.QBCount + lineup.Settings.WRCount + lineup.Settings.RBCount + i;
@@ -566,7 +596,7 @@ namespace Optimum_FF
             playerList.ItemsSource = lineup.Players;
             playerList.Items.Refresh();
         }
-
+        // Rank and value Ks
         private void RankKs()
         {
             List<Player> ks;
@@ -574,7 +604,7 @@ namespace Optimum_FF
 
             foreach (var player in ks)
             {
-                //Create SQL connection
+                // Create SQL connection
                 string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
                 using (var conn = new SqlConnection(connectionString))
                 {
@@ -585,15 +615,16 @@ namespace Optimum_FF
                         cmd.Parameters.AddWithValue("@Player", player.Name);
                         SqlDataReader dr = cmd.ExecuteReader();
 
-                        //Read QB Data
+                        // Read K Data
                         while (dr.Read())
                         {
-                            //Get Player info
+                            // Get name
                             string name = dr["Player"].ToString();
 
-                            //Check if player is null
+                            // Check if player is null
                             if (name == player.Name)
                             {
+                                // Get player stats
                                 double value = 0;
 
                                 double games = (int)dr["Games"];
@@ -622,16 +653,20 @@ namespace Optimum_FF
                     }
                 }
             }
+            // Order Ks by value
             ks = ks.OrderBy(x => x.Value).ToList();
+            // Rank Ks
             for (int i = ks.Count() - 1; i >= 0; i--)
             {
                 ks[i].Rank = ks.Count() - i;
             }
+            // Rank and value players in user lineup
             foreach (var player in lineup.Players) if (player.Position.EndsWith("K"))
                 {
                     player.Value = ks.Find(x => x.Name.Contains(player.Name)).Value;
                     player.Rank = ks.Find(x => x.Name.Contains(player.Name)).Rank;
                 }
+            // Order players in user lineup
             for (int i = 0; i < lineup.Settings.KCount; i++)
             {
                 int currentPlayer = lineup.Settings.QBCount + lineup.Settings.WRCount + lineup.Settings.RBCount + lineup.Settings.TECount + i;
@@ -650,7 +685,7 @@ namespace Optimum_FF
             playerList.ItemsSource = lineup.Players;
             playerList.Items.Refresh();
         }
-
+        // Rank and value DEFs
         private void RankDEFs()
         {
             List<Team> defs;
@@ -658,7 +693,7 @@ namespace Optimum_FF
 
             foreach (var team in defs)
             {
-                //Create SQL connection
+                // Create SQL connection
                 string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
                 using (var conn = new SqlConnection(connectionString))
                 {
@@ -669,15 +704,16 @@ namespace Optimum_FF
                         cmd.Parameters.AddWithValue("@Team", team.Name);
                         SqlDataReader dr = cmd.ExecuteReader();
 
-                        //Read QB Data
+                        // Read DEF Data
                         while (dr.Read())
                         {
-                            //Get Player info
+                            // Get name
                             string name = dr["Team"].ToString();
 
-                            //Check if player is null
+                            // Check if player is null
                             if (name == team.Name)
                             {
+                                // Get player stats
                                 double value = 0;
 
                                 int games = (int)dr["Games"];
@@ -705,16 +741,20 @@ namespace Optimum_FF
                     }
                 }
             }
+            // Order DEFs by value
             defs = defs.OrderBy(x => x.Value).ToList();
+            // Rank DEFs
             for (int i = defs.Count() - 1; i >= 0; i--)
             {
                 defs[i].Rank = defs.Count() - i;
             }
+            // Rank and value players in user lineup
             foreach (var player in lineup.Players) if (player.Position.EndsWith("DEF"))
                 {
                     player.Value = defs.Find(x => x.Name.Contains(player.Name)).Value;
                     player.Rank = defs.Find(x => x.Name.Contains(player.Name)).Rank;
                 }
+            // Order players in user lineup
             for (int i = 0; i < lineup.Settings.DEFCount; i++)
             {
                 int currentPlayer = lineup.Settings.QBCount + lineup.Settings.WRCount + lineup.Settings.RBCount + lineup.Settings.TECount + lineup.Settings.KCount + i;
@@ -733,7 +773,7 @@ namespace Optimum_FF
             playerList.ItemsSource = lineup.Players;
             playerList.Items.Refresh();
         }
-
+        // Rank and value DPs
         private void RankDPs()
         {
             List<Player> dps;
@@ -741,7 +781,7 @@ namespace Optimum_FF
 
             foreach (var player in dps)
             {
-                //Create SQL connection
+                // Create SQL connection
                 string connectionString = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
                 using (var conn = new SqlConnection(connectionString))
                 {
@@ -752,15 +792,16 @@ namespace Optimum_FF
                         cmd.Parameters.AddWithValue("@Player", player.Name);
                         SqlDataReader dr = cmd.ExecuteReader();
 
-                        //Read QB Data
+                        // Read DP Data
                         while (dr.Read())
                         {
-                            //Get Player info
+                            // Get name
                             string name = dr["Player"].ToString();
 
-                            //Check if player is null
+                            // Check if player is null
                             if (name == player.Name)
                             {
+                                // Get player stats
                                 double value = 0;
 
                                 int games = (int)dr["Games"];
@@ -780,16 +821,20 @@ namespace Optimum_FF
                     }
                 }
             }
+            // Order DPs by value
             dps = dps.OrderBy(x => x.Value).ToList();
+            // Rank DPs
             for (int i = dps.Count() - 1; i >= 0; i--)
             {
                 dps[i].Rank = dps.Count() - i;
             }
+            // Rank and value players in user lineup
             foreach (var player in lineup.Players) if (player.Position.EndsWith("DP"))
                 {
                     player.Value = dps.Find(x => x.Name.Contains(player.Name)).Value;
                     player.Rank = dps.Find(x => x.Name.Contains(player.Name)).Rank;
                 }
+            // Order players in user lineup
             for (int i = 0; i < lineup.Settings.TECount; i++)
             {
                 int currentPlayer = lineup.Settings.QBCount + lineup.Settings.WRCount + lineup.Settings.RBCount + lineup.Settings.TECount + lineup.Settings.KCount + lineup.Settings.DEFCount + i;
@@ -808,15 +853,17 @@ namespace Optimum_FF
             playerList.ItemsSource = lineup.Players;
             playerList.Items.Refresh();
         }
-
+        // Find trade suggestions
         private void GetTrades()
         {
+            // Order player lists
             double?[] arr = new double?[] { qbValue, wrValue, rbValue, teValue };
             Array.Sort(arr);
             qbsList = qbsList.OrderBy(x => x.Value).ToList();
             wrsList = wrsList.OrderBy(x => x.Value).ToList();
             rbsList = rbsList.OrderBy(x => x.Value).ToList();
             tesList = tesList.OrderBy(x => x.Value).ToList();
+            // If QB is best or 2nd best
             if (arr[arr.Length - 1] == qbValue || arr[arr.Length - 2] == qbValue)
             {
                 Player receive = new Player();
@@ -830,7 +877,7 @@ namespace Optimum_FF
                 {
                     trade = "second";
                 }
-
+                // If WR is worst or 2nd worst, find good value player
                 if ((arr[0] == wrValue && trade == "first") || (arr[1] == wrValue && trade == "second"))
                 {
                     foreach (Player wr in masterList.Players.FindAll(x => x.Position == "WR"))
@@ -852,6 +899,7 @@ namespace Optimum_FF
                         }
                     }      
                 }
+                // If RB is worst or second worst, find good value player
                 if ((arr[0] == rbValue && trade == "first") || (arr[1] == rbValue && trade == "second"))
                 {
                     foreach (Player rb in masterList.Players.FindAll(x => x.Position == "RB"))
@@ -873,6 +921,7 @@ namespace Optimum_FF
                         }
                     }
                 }
+                // If TE is worst or second worst, find good value player
                 if ((arr[0] == teValue && trade == "first") || (arr[1] == teValue && trade == "second"))
                 {
                     foreach (Player te in masterList.Players.FindAll(x => x.Position == "TE"))
@@ -907,6 +956,7 @@ namespace Optimum_FF
                     trades[3] = receive;
                 }
             }
+            // If WR is best or 2nd best
             if (arr[arr.Length - 1] == wrValue || arr[arr.Length - 2] == wrValue)
             {
                 Player receive = new Player();
@@ -920,7 +970,7 @@ namespace Optimum_FF
                 {
                     trade = "second";
                 }
-
+                // If QB is worst or 2nd worst, find good value player
                 if ((arr[0] == qbValue && trade == "first") || (arr[1] == qbValue && trade == "second"))
                 {
                     foreach (Player qb in masterList.Players.FindAll(x => x.Position == "QB"))
@@ -942,6 +992,7 @@ namespace Optimum_FF
                         }
                     }
                 }
+                // If RB is worst or 2nd worst, find good value player
                 if ((arr[0] == rbValue && trade == "first") || (arr[1] == rbValue && trade == "second"))
                 {
                     foreach (Player rb in masterList.Players.FindAll(x => x.Position == "RB"))
@@ -963,6 +1014,7 @@ namespace Optimum_FF
                         }
                     }
                 }
+                // If TE is worst or 2nd worst, find good value player
                 if ((arr[0] == teValue && trade == "first") || (arr[1] == teValue && trade == "second"))
                 {
                     foreach (Player te in masterList.Players.FindAll(x => x.Position == "TE"))
@@ -997,6 +1049,7 @@ namespace Optimum_FF
                     trades[3] = receive;
                 }
             }
+            // If RB is best or 2nd best
             if (arr[arr.Length - 1] == rbValue || arr[arr.Length - 2] == rbValue)
             {
                 Player receive = new Player();
@@ -1010,7 +1063,7 @@ namespace Optimum_FF
                 {
                     trade = "second";
                 }
-
+                // If WR is worst or 2nd worst, find good value player
                 if ((arr[0] == wrValue && trade == "first") || (arr[1] == wrValue && trade == "second"))
                 {
                     foreach (Player wr in masterList.Players.FindAll(x => x.Position == "WR"))
@@ -1032,6 +1085,7 @@ namespace Optimum_FF
                         }
                     }
                 }
+                // If QB is worst or 2nd worst, find good value player
                 if ((arr[0] == qbValue && trade == "first") || (arr[1] == qbValue && trade == "second"))
                 {
                     foreach (Player qb in masterList.Players.FindAll(x => x.Position == "QB"))
@@ -1053,6 +1107,7 @@ namespace Optimum_FF
                         }
                     }
                 }
+                // If TE is worst or 2nd worst, find good value player
                 if ((arr[0] == teValue && trade == "first") || (arr[1] == teValue && trade == "second"))
                 {
                     foreach (Player te in masterList.Players.FindAll(x => x.Position == "TE"))
@@ -1087,6 +1142,7 @@ namespace Optimum_FF
                     trades[3] = receive;
                 }
             }
+            // If TE is best or 2nd best
             if (arr[arr.Length - 1] == teValue || arr[arr.Length - 2] == teValue)
             {
                 Player receive = new Player();
@@ -1100,7 +1156,7 @@ namespace Optimum_FF
                 {
                     trade = "second";
                 }
-
+                // If WR is worst or 2nd worst, find good value player
                 if ((arr[0] == wrValue && trade == "first") || (arr[1] == wrValue && trade == "second"))
                 {
                     foreach (Player wr in masterList.Players.FindAll(x => x.Position == "WR"))
@@ -1122,6 +1178,7 @@ namespace Optimum_FF
                         }
                     }
                 }
+                // If QB is worst or 2nd worst, find good value player
                 if ((arr[0] == qbValue && trade == "first") || (arr[1] == qbValue && trade == "second"))
                 {
                     foreach (Player qb in masterList.Players.FindAll(x => x.Position == "QB"))
@@ -1143,6 +1200,7 @@ namespace Optimum_FF
                         }
                     }
                 }
+                // If RB is worst or 2nd worst, find good value player
                 if ((arr[0] == rbValue && trade == "first") || (arr[1] == rbValue && trade == "second"))
                 {
                     foreach (Player rb in masterList.Players.FindAll(x => x.Position == "RB"))
@@ -1179,20 +1237,21 @@ namespace Optimum_FF
             }
             tradesList.Items.Refresh();
         }
-
+        // Navigate to settings page
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             mainWindow?.ChangeView(new SettingsPage());
         }
-
+        // Export lineup
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
+            // Create save file dialog
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.Filter = "CSV Spreadsheet|*.csv";
             dialog.Title = "Save Settings";
             dialog.ShowDialog();
-
+            // Write data to CSV if given a valid file name
             if (dialog.FileName != "")
             {
                 FileStream fs = (FileStream)dialog.OpenFile();

@@ -24,7 +24,6 @@ namespace Optimum_FF
         {
             InitializeComponent();
         }
-
         //Navigate to the Optimize Page
         private void OptimizeButton_Click(object sender, RoutedEventArgs e)
         {

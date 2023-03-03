@@ -12,7 +12,7 @@ namespace Optimum_FF
         public string? Opponent { get; set; }
         public double? Value { get; set; }
         public int? Rank { get; set; } 
-
+        // Default constructor
         public Team()
         {
             Name = "";

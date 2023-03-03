@@ -26,10 +26,11 @@ namespace Optimum_FF
         {
             InitializeComponent();
         }
-
+        // Send settings to optimize page
         private void DoneButton_Click(object sender, RoutedEventArgs e)
         {
             Settings settings = new Settings();
+            // Try to read in selected settings
             try
             {
                 settings.LeagueType = LeagueTypeSelection.Text;
@@ -53,9 +54,10 @@ namespace Optimum_FF
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             mainWindow?.ChangeView(new OptimizePage(settings));
         }
-
+        // Import user lineup/settings from CSV
         private void ImportButton_Click(object sender, RoutedEventArgs e)
         {
+            // Dialog for loading CSV
             Settings settings = new Settings();
             Lineup lineup = new Lineup(settings);
             PlayerMasterList masterList = new PlayerMasterList();
@@ -67,6 +69,7 @@ namespace Optimum_FF
 
             if (dialog.ShowDialog() == true)
             {
+                // Try to read from CSV
                 try
                 {
                     string[] lines = File.ReadAllLines(dialog.FileName);
@@ -78,6 +81,7 @@ namespace Optimum_FF
                         {
                             int num = 0;
                             bool isDigit = int.TryParse(columns[0], out num);
+                            // Set position counts
                             if (isDigit)
                             {
                                 settings.QBCount = int.Parse(columns[0]);
@@ -93,6 +97,7 @@ namespace Optimum_FF
                                 settings.LeagueType = columns[10];
                                 lineup = new Lineup(settings);
                             }
+                            // Read in players
                             else
                             {
                                 if (columns[0] == "Bench")
@@ -131,6 +136,7 @@ namespace Optimum_FF
                     MessageBox.Show("CSV format invalid");
                     return;
                 }
+                // Send lineup to optimize page
                 var mainWindow = (MainWindow)Application.Current.MainWindow;
                 mainWindow?.ChangeView(new OptimizePage(lineup));
             }
