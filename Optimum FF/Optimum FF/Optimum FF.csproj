@@ -9,7 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="FootballScraper.exe" />
     <None Remove="img\OFF.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="FootballScraper.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

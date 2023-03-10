@@ -400,3 +400,5 @@ FodyWeavers.xsd
 # Python Executable files
 *.spec
 Optimum FF/build
+optimum FF/dist
+Optimum FF/App.config

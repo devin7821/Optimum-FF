@@ -27,21 +27,8 @@ namespace Optimum_FF
         {
             InitializeComponent();
             //Call webscraping script
-            Process proc = new Process();
-            DirectoryInfo dirInfo = Directory.GetParent(Directory.GetCurrentDirectory());
-            string path = @dirInfo.Parent.Parent.ToString();
-            path += @"\dist\FootballScraper\FootballScraper.exe";
-            proc.StartInfo.FileName = path;
-            proc.StartInfo.Arguments = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
-            proc.StartInfo.UseShellExecute = false;
-            proc.StartInfo.CreateNoWindow = true;
-            proc.Start();
-
             Application.Current.MainWindow = this;
             Loaded += OnMainMenuLoaded;
-
-            proc.WaitForExit(1000 * 60 * 10);
-            Debug.WriteLine("Script done");
         }
         // Navigate to main menu
         private void OnMainMenuLoaded(object sender, RoutedEventArgs e)

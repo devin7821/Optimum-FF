@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,6 +27,10 @@ namespace Optimum_FF
         public MainMenu()
         {
             InitializeComponent();
+            //Call webscraping script
+            Process.Start(new ProcessStartInfo { FileName = "FootballScraper.exe", 
+                Arguments = ConfigurationManager.ConnectionStrings["connection"].ConnectionString, UseShellExecute = false,
+            CreateNoWindow = true }).WaitForExit(1000 * 60 * 10);
         }
         //Navigate to the Optimize Page
         private void OptimizeButton_Click(object sender, RoutedEventArgs e)
