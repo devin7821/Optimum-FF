@@ -593,7 +593,7 @@ def AddKs(cursor, cnxn):
     cnxn.commit()
 
 def main():
-    connectionString = "SERVER=offsqlserver.database.windows.net;DATABASE=OFF;UID=mainuser;PWD=optimumfootball3!"#str(sys.argv[1])
+    connectionString = str(sys.argv[1])
     #Create DB Connection
     cnxn = pyodbc.connect('DRIVER={SQL Server};' + connectionString)
     cursor = cnxn.cursor()
