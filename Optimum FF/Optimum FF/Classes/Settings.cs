@@ -19,7 +19,7 @@ namespace Optimum_FF
         public int DPCount { get; set; }
         public int FlexCount { get; set; }
         public int BenchCount { get; set; }
-
+        // Default constructor
         public Settings()
         {
             LeagueType = "Standard";

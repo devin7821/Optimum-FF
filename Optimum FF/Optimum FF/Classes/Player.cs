@@ -16,7 +16,7 @@ namespace Optimum_FF
         public Team? Team { get; set; }
         public double? Value { get; set; }
         public int? Rank { get; set; }
-
+        // Default constructor
         public Player()
         {
             Name = "";
@@ -24,7 +24,7 @@ namespace Optimum_FF
             Team = new Team();
             Value = 0;
         }
-
+        // String override for display
         public override string ToString()
         {
             return this.Position + " " + this.Name + " " + this.Team.Name + "\nValue: " + this.Value + " Rank: " + this.Rank;
