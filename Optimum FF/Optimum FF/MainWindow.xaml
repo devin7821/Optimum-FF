@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Optimum_FF"
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="500">
-    <Grid Loaded="OnMainMenuLoaded">
+    <Grid Loaded="OnConfirmMenuLoaded">
         <Frame
             Name="mainFrame"
             Background="White"

@@ -23,6 +23,7 @@
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="DotNetProjects.WpfToolkit.Input" Version="6.1.94" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.5.0" />
+    <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
 

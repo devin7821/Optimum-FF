@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:fa="http://schemas.fontawesome.io/icons/"
       xmlns:local="clr-namespace:Optimum_FF"
       xmlns:controls='clr-namespace:System.Windows.Controls;assembly=DotNetProjects.Input.Toolkit'
       mc:Ignorable="d" 

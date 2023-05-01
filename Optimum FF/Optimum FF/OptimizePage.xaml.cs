@@ -221,6 +221,7 @@ namespace Optimum_FF
         // Optimize the user lineup
         private void OptimizeButton_Click(object sender, RoutedEventArgs e)
         {
+            Mouse.OverrideCursor = Cursors.Wait;
             // Put names into first-last form
             foreach (var player in masterList.Players) if (player.Name.Length > 3)
                 {
@@ -243,6 +244,7 @@ namespace Optimum_FF
                     var names = player.Name.Split(' ');
                     player.Name = (names[1] + " " + names[0]);
                 }
+            Mouse.OverrideCursor = Cursors.Arrow;
         }
         // Rank and value qbs
         private void RankQBs()

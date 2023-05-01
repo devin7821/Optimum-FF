@@ -28,12 +28,12 @@ namespace Optimum_FF
             InitializeComponent();
             //Call webscraping script
             Application.Current.MainWindow = this;
-            Loaded += OnMainMenuLoaded;
+            Loaded += OnConfirmMenuLoaded;
         }
         // Navigate to main menu
-        private void OnMainMenuLoaded(object sender, RoutedEventArgs e)
+        private void OnConfirmMenuLoaded(object sender, RoutedEventArgs e)
         {
-            ChangeView(new MainMenu());
+            ChangeView(new ConfirmPage());
         }
         // Change the page view
         public void ChangeView(Page view)

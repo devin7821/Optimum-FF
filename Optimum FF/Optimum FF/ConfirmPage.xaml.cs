@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,20 +16,25 @@ using System.Windows.Shapes;
 namespace Optimum_FF
 {
     /// <summary>
-    /// Interaction logic for MainMenu.xaml
+    /// Interaction logic for ConfirmPage.xaml
     /// </summary>
-    public partial class MainMenu : Page
+    public partial class ConfirmPage : Page
     {
-        public MainMenu()
+        public ConfirmPage()
         {
             InitializeComponent();
         }
-        //Navigate to the Optimize Page
-        private void OptimizeButton_Click(object sender, RoutedEventArgs e)
+
+        private void no_button_Click(object sender, RoutedEventArgs e)
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
-            Settings settings = new Settings();
-            mainWindow?.ChangeView(new OptimizePage(settings));
+            mainWindow?.ChangeView(new MainMenu());
+        }
+
+        private void yes_button_Click(object sender, RoutedEventArgs e)
+        {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow?.ChangeView(new ScrapingPage());
         }
     }
 }
